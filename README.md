@@ -1,7 +1,8 @@
 # conkystuff
 BayouGuru's online conky repository
 
-This repository contains all of the currently active conkys on BayouGuru's main system.  There are three conkys.  
+This repository contains all of the currently active conkys on BayouGuru's main system.  There are three conkys, named as follows:
+
 "conky.conf" - The main conky, which displays the main system information such as the temperatures, disk space usage, cpu & ram usage and resides at the left-top of the screen, 
 
 "weatherconky.conf" - The weather conky, which lives at the bottom-left of the screen, parses the AccuWeather RSS feed.
