@@ -1,5 +1,5 @@
 BayouGuru's Conky ReadMe!
-Version 3-27-2024.0457
+Version 3-27-2024.0740
 
 This ReadMe is for the conky collection created a bit at a time as inspiration 
 or necessity struck for the machine known as "bg-l-box", property of 
@@ -54,7 +54,7 @@ following directories:
         to 4 incoming and 12 outgoing connections.
     
         The images/icons used are all in the ~/.conky/images/ subdirectory.  
-        There are currently 9 images & icons used between the 2 conkys.
+        There are currently 10 images & icons used between the 2 conkys.
         
         /home/bayouguru/.conky/conkybars.lua - 
         The left conky uses lua to make the really cool looking segmented bars.
@@ -67,22 +67,11 @@ following directories:
         was compiled with lua extensions enabled.  This script is functioning 
         on/as of conky 1.19.8.
         
-        There are 2 scripts in the /scripts/ subdirectory.
+        There is 1 script in the /scripts/ subdirectory.
             
             hostname.sh is a bash shell script that retrieves the WAN 
                 hostname.
             
-            ipv6.sh is a bash shell script that retrieves the ip version 6 
-                address.  NOTE:  This does not currently support or distinguish 
-                between multiple ipv6 addresses, such as local and WAN ipv6 
-                addresses like the ipv4 addresses do, though it should be 
-                poossible to add it.  Bear in mind that adding another line of
-                to display the remote ipv6 address can cause the connection 
-                list to run off the bottom of the screen at 1080p or less 
-                resolution when it fully-populates...unless you shorten it 
-                somehow.
-
-    
 These conkys use the following fonts:
     Arial                   - Used for the ANSI
     Larabiefont-Regular     - The main font used throughout
@@ -94,9 +83,19 @@ They were/are in a constant state of evolution as I get better at working with
 the conky config file syntax and incorporating the various external items.
 
 These files have been shared online along with the associated screenshots 
-so that if you wish to edit this conky for your own use, you can and should 
+as-is so that if you wish to edit this conky for your own use, you can and should 
 feel free to do so.  Pay attention to the file modified dates on Google Drive
 or Dropbox, as these conkys are still a work in progress as I continue to learn.
 
+NOTE:  The weather conky, the ipv6 script and the 2 hard drive scripts have all 
+been discontinued for various reasons and are no longer supported.  
+    The ipv6 script is no longer necessary. 
+    The hard drive scripts were too annoying (HDD light blinking every second/
+refresh and permission issues after updates) 
+    The weather script has been discontinued due to the constantly 
+changing nature of the various weather providers' API's/sites and the 
+availability of better weather apps for my Plasma desktop.
+
 If you require some assistance or explanations, please feel free to find me on
-IRC as BayouGuru or BayouGuru67 at https://libera.chat in the #conky channel.
+reddit, email or sometimes on IRC as BayouGuru or BayouGuru67 at 
+https://libera.chat in the #conky channel.
