@@ -54,9 +54,9 @@ following directories:
         to 4 incoming and 12 outgoing connections.
     
         The images/icons used are all in the ~/.conky/images/ subdirectory.  
-        There are currently 10 images & icons used between the 2 conkys.
+        There are currently ~10 images & icons used between the 2 conkys.
         
-        /home/bayouguru/.conky/conkybars.lua - 
+        ~/.conky/conkybars.lua - 
         The left conky uses lua to make the really cool looking segmented bars.
         You will need to edit this script as-appropriate for your system, as
         it contains the paths to my particular hard drives and swap setup.  The
@@ -66,6 +66,12 @@ following directories:
         work on systems with conky-all or a conky installation like mine which 
         was compiled with lua extensions enabled.  This script is functioning 
         on/as of conky 1.19.8.
+        
+        ~/.conky/updownbars.lua - 
+        The right conky uses lua to make the really cool looking segmented bars
+        above and below the network icon showing the upload and download loads.
+        You will need to edit this script as-appropriate for your system, as
+        it contains the information for my particular setup.        
         
         There is 1 script in the /scripts/ subdirectory.
             
