@@ -10,7 +10,7 @@ I recommend only editing the lower section of the file where the bars are actual
 
 "rightconky.conf" - The right-top conky, which displays the system's  network information, the top 5 users of CPU and ram, up to 6 inbound and up to 12 outbound network connections, reszing as-needed.
 
-"updownbars.lua" - The right conky uses lua to make the really cool looking segmented bars above and below the network icon showing the upload and download loads.  You will need to edit this script as-appropriate for your system, as it contains the information for my particular network setup and screen size (1080p).        
+"updownbars.lua" - The right conky uses lua to make the really cool looking segmented bars showing the upload and download loads.  You will need to edit this script as-appropriate for your system, as it contains the information for my particular network setup and screen size (1080p).        
 
 These conky configurations are posted here for you to modify and use as you please.  I make no warranty as to their functionality on any system other than my own, as it is a certainty that you WILL need to edit these configurations in order to tailor them to the particulars of your system.  This is especially true of the temerature data, which can change locations simply by connecting another device to your system.  These conkys are the result of months of very intense work refining and tweaking the configurations to fit my use-case.  If you find it useful, then I am glad.  If you have questions, please feel free to ask me!
 
