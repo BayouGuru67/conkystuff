@@ -8,7 +8,7 @@ This repository contains all of the currently active conkys on BayouGuru's main 
 "conkybars.lua" - The Lua script which is responsible for rendering the cool looking segmented LED bars in the left conky.  You will need to edit this file as-needed for the particulars of your hardware setup.
 I recommend only editing the lower section of the file where the bars are actually created.  Credit for this script goes to Reddit user u/DareBoy58 who shared his version of the script which ChatGPT and I edited heavily to suit our purposes and get it working on my installation.  Bear in mind that you MUST be running a conky-all or conky-lua build with the Lua extensions enabled in order to use this script! 
 
-"rightconky.conf" - The right-top conky, which displays the system's  network information, the top 5 users of CPU and ram, up to 6 inbound and up to 12 outbound network connections, reszing as-needed.
+"rightconky.conf" - The right-top conky, which displays the system's network information, the top 5 users of CPU and ram, up to 6 inbound and up to 12 outbound network connections, reszing as-needed. It also features the lua LED upload and download bars to show bandwidth usage.
 
 "updownbars.lua" - The right conky uses lua to make the really cool looking segmented bars showing the upload and download loads.  You will need to edit this script as-appropriate for your system, as it contains the information for my particular network setup and screen size (1080p).        
 
