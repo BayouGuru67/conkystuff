@@ -50,8 +50,20 @@ following directories:
 
         ~/.conky/rightconky.conf -
         The right conky's configuration file (rightconky.conf) has the active 
-        processes, top 5 RAM and CPU processes, network info and the list of up
-        to 4 incoming and 12 outgoing connections.
+        processes, top 5 RAM and CPU processes, the network info and the list 
+        of up to 6 incoming and 18 outgoing connections, minus the incoming 
+        connections, as it is set to display no more than 18 total.  The 
+        conky now no longer uses negative voffsets to remove blank space, as
+        I have finally figured out the use of the "\" in the config, which 
+        is a tricky one.  Don't mess with the line break formatting of the 
+        conky or the list won't display correctly, trust me!  If you want 
+        to use this config, search and replace the 6 instances my network 
+        adapter name of "enp6s0" with the name of your network adapter.
+        This conky also features the lua upload and download bars.
+        Designed to fit on a 1080p screen, this conky should be easily
+        expandable to work equally well on higher resolution displays,
+        yielding the option to show even more connections.  Just follow the
+        logic and layout pattern already established and enjoy!
     
         The images/icons used are all in the ~/.conky/images/ subdirectory.  
         There are currently ~10 images & icons used between the 2 conkys.
@@ -69,7 +81,7 @@ following directories:
         
         ~/.conky/updownbars.lua - 
         The right conky uses lua to make the really cool looking segmented bars
-        above and below the network icon showing the upload and download loads.
+        showing the upload and download loads.
         You will need to edit this script as-appropriate for your system, as
         it contains the information for my particular setup.        
         
