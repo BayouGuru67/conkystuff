@@ -1,7 +1,5 @@
-#!/bin/env bash
-if [ "$DESKTOP_SESSION" = "plasma" ]; then 
-sleep 3s
-./conky -dc "/home/bayouguru/.conky/conky.conf" &
-./conky -dc "/home/bayouguru/.conky/rightconky.conf" &
-exit 0
-fi
+#!/bin/bash
+sleep 3
+/usr/bin/conky -d -c "/home/bayouguru/.conky/conky.conf" &
+/usr/bin/conky -d -c "/home/bayouguru/.conky/rightconky.conf" &
+

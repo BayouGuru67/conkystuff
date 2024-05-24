@@ -1,5 +1,4 @@
 # conkybars.lua
-
 --[[ EQUALIZER WIDGET
  
  The arguments are :
@@ -25,6 +24,7 @@
  
 ]]
 require 'cairo'
+require 'cairo_xlib'
 
 function equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc, bga, fgc, fga,alc,ala,alarm,led_effect,led_alpha,smooth,mid_color,mid_alpha,rotation)
 
@@ -151,57 +151,57 @@ end
 --[[ equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc, bga, fgc, fga,alc,ala,alarm,led_effect,led_alpha,smooth,mid_color,mid_alpha,rotation) ]]
   -- Cpu1
   cr = cairo_create(cs)
-  equalizer(cr, 4, 100, 'cpu', 'cpu1', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 4, 96, 'cpu', 'cpu1', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Cpu2
   cr = cairo_create(cs)
-  equalizer(cr, 134, 100, 'cpu', 'cpu2', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 136, 96, 'cpu', 'cpu2', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Cpu3
   cr = cairo_create(cs)
-  equalizer(cr, 4, 135, 'cpu', 'cpu3', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 4, 131, 'cpu', 'cpu3', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Cpu4
   cr = cairo_create(cs)
-  equalizer(cr, 134, 135, 'cpu', 'cpu4', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 136, 131, 'cpu', 'cpu4', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Cpu5
   cr = cairo_create(cs)
-  equalizer(cr, 4, 171, 'cpu', 'cpu5', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 4, 167, 'cpu', 'cpu5', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Cpu6
   cr = cairo_create(cs)
-  equalizer(cr, 134, 171, 'cpu', 'cpu6', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 136, 167, 'cpu', 'cpu6', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Cpu Full Load
   cr = cairo_create(cs)
-  equalizer(cr, 4, 206, 'cpu', 'cpu0', 100, 86, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 4, 202, 'cpu', 'cpu0', 100, 86, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Ram
   cr = cairo_create(cs)
-  equalizer(cr, 56, 502, 'memperc', '', 100, 68, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 56, 498, 'memperc', '', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Swap
   cr = cairo_create(cs)
-  equalizer(cr, 56, 817, 'swapperc', '', 100, 68, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 56, 813, 'swapperc', '', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- SSD Free Space
   cr = cairo_create(cs)
-  equalizer(cr, 56, 692, 'fs_used_perc', '/', 100, 68, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1,
+  equalizer(cr, 56, 688, 'fs_used_perc', '/', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1,
     0xff0000, 1, 75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- HDD Free Space
   cr = cairo_create(cs)
-  equalizer(cr, 56, 764, 'fs_used_perc', '/home/bayouguru/WD-500GB/', 100, 68, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070,
+  equalizer(cr, 56, 760, 'fs_used_perc', '/home/bayouguru/N-1Tb/', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070,
     1, 0x00ff0c, 1, 0xff0000, 1, 75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
 end
