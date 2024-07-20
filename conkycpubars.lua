@@ -1,5 +1,4 @@
-# updownbars.lua
-
+# conkybars.lua
 --[[ EQUALIZER WIDGET
  
  The arguments are :
@@ -150,12 +149,39 @@ end
   local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable, conky_window.visual, conky_window.width, conky_window.height)
 -- -------------------------------------------------------------------------------------
 --[[ equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc, bga, fgc, fga,alc,ala,alarm,led_effect,led_alpha,smooth,mid_color,mid_alpha,rotation) ]]
--- Upload
-cr = cairo_create(cs)
-equalizer(cr, 77, 327, 'upspeedf', 'enp8s0', 20000, 74, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1, 80, true, 1, true, 0xffff00, 1, 90)
-cairo_destroy(cr)
--- Download
-cr = cairo_create(cs)
-equalizer(cr, 77, 344, 'downspeedf', 'enp8s0', 50000, 74, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1, 80, true, 1, true, 0xffff00, 1, 90)
-cairo_destroy(cr)
+  -- Cpu1
+  cr = cairo_create(cs)
+  equalizer(cr, 4, 20, 'cpu', 'cpu1', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+    75, true, 1, true, 0xffff00, 1, 90)
+  cairo_destroy(cr)
+  -- Cpu2
+  cr = cairo_create(cs)
+  equalizer(cr, 136, 20, 'cpu', 'cpu2', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+    75, true, 1, true, 0xffff00, 1, 90)
+  cairo_destroy(cr)
+  -- Cpu3
+  cr = cairo_create(cs)
+  equalizer(cr, 4, 56, 'cpu', 'cpu3', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+    75, true, 1, true, 0xffff00, 1, 90)
+  cairo_destroy(cr)
+  -- Cpu4
+  cr = cairo_create(cs)
+  equalizer(cr, 136, 56, 'cpu', 'cpu4', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+    75, true, 1, true, 0xffff00, 1, 90)
+  cairo_destroy(cr)
+  -- Cpu5
+  cr = cairo_create(cs)
+  equalizer(cr, 4, 92, 'cpu', 'cpu5', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+    75, true, 1, true, 0xffff00, 1, 90)
+  cairo_destroy(cr)
+  -- Cpu6
+  cr = cairo_create(cs)
+  equalizer(cr, 136, 92, 'cpu', 'cpu6', 100, 42, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+    75, true, 1, true, 0xffff00, 1, 90)
+  cairo_destroy(cr)
+  -- Cpu Full Load
+  cr = cairo_create(cs)
+  equalizer(cr, 4, 128, 'cpu', 'cpu0', 100, 86, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+    75, true, 1, true, 0xffff00, 1, 90)
+  cairo_destroy(cr)
 end
