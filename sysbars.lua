@@ -151,22 +151,22 @@ end
 --[[ equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc, bga, fgc, fga,alc,ala,alarm,led_effect,led_alpha,smooth,mid_color,mid_alpha,rotation) ]]
   -- Ram
   cr = cairo_create(cs)
-  equalizer(cr, 56, 250, 'memperc', '', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 56, 256, 'memperc', '', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- SSD Free Space
   cr = cairo_create(cs)
-  equalizer(cr, 56, 417, 'fs_used_perc', '/', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1,
+  equalizer(cr, 56, 423, 'fs_used_perc', '/', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1,
     0xff0000, 1, 75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- SSD Free Space
   cr = cairo_create(cs)
-  equalizer(cr, 56, 477, 'fs_used_perc', '/home/bayouguru/N-1Tb/', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070,
+  equalizer(cr, 56, 483, 'fs_used_perc', '/home/bayouguru/N-1Tb/', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070,
     1, 0x00ff0c, 1, 0xff0000, 1, 75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
   -- Swap
   cr = cairo_create(cs)
-  equalizer(cr, 56, 522, 'swapperc', '', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
+  equalizer(cr, 56, 528, 'swapperc', '', 100, 69, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1,
     75, true, 1, true, 0xffff00, 1, 90)
   cairo_destroy(cr)
 end
