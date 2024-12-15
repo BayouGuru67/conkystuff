@@ -2,85 +2,110 @@
 require 'cairo'
 require 'cairo_xlib'
 
--- Optimized RGB to RGBA conversion (cached)
+-- Helper function: Convert hex color to RGBA
 local function rgb_to_r_g_b(colour, alpha)
     return ((colour / 0x10000) % 0x100) / 255., ((colour / 0x100) % 0x100) / 255., (colour % 0x100) / 255., alpha
 end
 
--- Optimized equalizer function
-function updownbars_equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc, bga, fgc, fga, alc, ala, alarm, led_effect, led_alpha, smooth, mid_color, mid_alpha, rotation)
-    -- Parse the value just once instead of repeatedly
-    local str = conky_parse(string.format('${%s %s}', name, arg))
+-- Helper function: Draw a single block with LED effect
+local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alpha)
+    local xx0, xx1, yy0, yy1
+    if angle == 90 or angle == 270 then
+        xx0, xx1 = x2, x2
+        yy0, yy1 = y2, y2 + w
+    else
+        xx0, xx1 = x2, x2 + w * math.cos(angle)
+        yy0, yy1 = y2, y2 + w * math.sin(angle)
+    end
+
+    cairo_move_to(cr, xx0, yy0)
+    cairo_line_to(cr, xx1, yy1)
+
+    if led_effect then
+        local xc, yc = (xx0 + xx1) / 2, (yy0 + yy1) / 2
+        local pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w / 2)
+        cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, led_alpha))
+        cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha))
+        cairo_set_source(cr, pat)
+        cairo_pattern_destroy(pat)
+    else
+        cairo_set_source_rgba(cr, rgb_to_r_g_b(col, alpha))
+    end
+
+    cairo_stroke(cr)
+end
+
+-- Main function: Draw equalizer bars
+local function updownbars_equalizer(cr, params)
+    local str = conky_parse(string.format('${%s %s}', params.name, params.arg))
     local value = tonumber(str) or 0
-    local pct = 100 * value / max
-    local pcb = 100 / nb_blocks
+    local pct = 100 * value / params.max
+    local pcb = 100 / params.nb_blocks
 
-    cairo_set_line_width(cr, h)
-    cairo_set_line_cap(cr, cap)
+    cairo_set_line_width(cr, params.h)
+    cairo_set_line_cap(cr, params.cap)
 
-    local angle = rotation * math.pi / 180
-    local alpha_bg, alpha_fg, alpha_alarm
-    -- Precompute the color values
-    local bg_r, bg_g, bg_b = rgb_to_r_g_b(bgc, bga)
-    local fg_r, fg_g, fg_b = rgb_to_r_g_b(fgc, fga)
-    local alc_r, alc_g, alc_b = rgb_to_r_g_b(alc, ala)
-
-    for pt = 1, nb_blocks do
+    local angle = params.rotation * math.pi / 180
+    for pt = 1, params.nb_blocks do
         local blockStartPercentage = (pt - 1) * pcb
-        -- Conditional for changing colors
-        local col_r, col_g, col_b, alpha = bg_r, bg_g, bg_b, bga
+        local col, alpha = params.bgc, params.bga
+
         if pct >= blockStartPercentage then
-            col_r, col_g, col_b, alpha = fg_r, fg_g, fg_b, fga
-            if pct >= alarm then
-                col_r, col_g, col_b, alpha = alc_r, alc_g, alc_b, ala
+            col, alpha = params.fgc, params.fga
+            if pct >= params.warning and pct < params.alarm then
+                col, alpha = params.wc, params.wa  -- Yellow for warning
+            elseif pct >= params.alarm then
+                col, alpha = params.alc, params.ala  -- Red for alarm
             end
         end
 
-        local y1 = yb - pt * (h + space)
-        local radius0 = yb - y1
-        local x2 = xb + radius0 * math.sin(angle)
-        local y2 = yb - radius0 * math.cos(angle)
+        local y1 = params.yb - pt * (params.h + params.space)
+        local radius0 = params.yb - y1
+        local x2 = params.xb + radius0 * math.sin(angle)
+        local y2 = params.yb - radius0 * math.cos(angle)
 
-        local xx0, xx1, yy0, yy1
-        if rotation == 90 or rotation == 270 then
-            xx0, xx1 = x2, x2
-            yy0, yy1 = yb, yb + w
-        else
-            xx0, xx1 = x2, x2 + w * math.cos(angle)
-            yy0, yy1 = y2 - (y2 - yb) / ((y2 - yb) / (x2 - xb)), y2 + w * math.sin(angle)
-        end
-
-        cairo_move_to(cr, xx0, yy0)
-        cairo_line_to(cr, xx1, yy1)
-
-        -- If LED effect is enabled, apply radial pattern
-        if led_effect then
-            local xc, yc = (xx0 + xx1) / 2, (yy0 + yy1) / 2
-            local pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w / 1.5)
-            cairo_pattern_add_color_stop_rgba(pat, 0, col_r, col_g, col_b, led_alpha)
-            cairo_pattern_add_color_stop_rgba(pat, 1, col_r, col_g, col_b, alpha)
-            cairo_set_source(cr, pat)
-            cairo_pattern_destroy(pat)
-        else
-            cairo_set_source_rgba(cr, col_r, col_g, col_b, alpha)
-        end
-
-        cairo_stroke(cr)
+        draw_block(cr, x2, y2, params.w, angle, col, alpha, params.led_effect, params.led_alpha)
     end
 end
 
--- Optimized Conky widget rendering function
+-- Main Conky widget function
 function conky_updownbars_widgets()
     if conky_window == nil then return end
-    local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable, conky_window.visual, conky_window.width, conky_window.height)
 
+    -- Create surface and context
+    local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable, conky_window.visual, conky_window.width, conky_window.height)
     local cr = cairo_create(cs)
 
-    -- Upload equalizer
-    updownbars_equalizer(cr, 74, 331, 'upspeedf', 'enp4s0', 20000, 75, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1, 80, true, 1, true, 0xffff00, 1, 90)
+    -- Parameters for upload and download bars
+    local bars = {
+        {
+            xb = 74, yb = 331, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 75,
+            cap = CAIRO_LINE_CAP_SQUARE, w = 10, h = 2, space = 1,
+            bgc = 0x404040, bga = 0.3,
+            fgc = 0x00ff00, fga = 1,  -- Bright green
+            wc = 0xffff00, wa = 1,   -- Bright yellow
+            alc = 0xff0000, ala = 1, -- Bright red
+            warning = 50, alarm = 80,
+            led_effect = true, led_alpha = 0.8, rotation = 90
+        },
+        {
+            xb = 74, yb = 348, name = 'downspeedf', arg = 'enp4s0', max = 50000, nb_blocks = 75,
+            cap = CAIRO_LINE_CAP_SQUARE, w = 10, h = 2, space = 1,
+            bgc = 0x404040, bga = 0.3,
+            fgc = 0x00ff00, fga = 1,  -- Bright green
+            wc = 0xffff00, wa = 1,   -- Bright yellow
+            alc = 0xff0000, ala = 1, -- Bright red
+            warning = 50, alarm = 80,
+            led_effect = true, led_alpha = 0.8, rotation = 90
+        }
+    }
 
-    -- Download equalizer
-    updownbars_equalizer(cr, 74, 348, 'downspeedf', 'enp4s0', 50000, 75, CAIRO_LINE_CAP_SQUARE, 10, 2, 1, 0x606070, 1, 0x00ff0c, 1, 0xff0000, 1, 80, true, 1, true, 0xffff00, 1, 90)
+    -- Draw each bar
+    for _, params in ipairs(bars) do
+        updownbars_equalizer(cr, params)
+    end
 
+    -- Clean up
     cairo_destroy(cr)
+    cairo_surface_destroy(cs)
 end

@@ -51,9 +51,12 @@ local function equalizer(cr, params)
         local col, alpha = params.bgc, params.bga
 
         if pct >= blockStartPercentage then
-            col, alpha = params.fgc, params.fga
-            if pct >= params.alarm then
-                col, alpha = params.alc, params.ala
+            if pct >= params.high_alarm then
+                col, alpha = params.alc, params.ala  -- Red for high usage
+            elseif pct >= params.alarm then
+                col, alpha = params.yelc, params.yela  -- Yellow for medium usage
+            else
+                col, alpha = params.fgc, params.fga  -- Green for normal usage
             end
         end
 
@@ -78,23 +81,27 @@ function conky_sysbars_widgets()
     local equalizer_params = {
         {
             xb = 55, yb = 255, name = 'memperc', arg = '', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
-            w = 10, h = 2, space = 1, bgc = 0x606070, bga = 1, fgc = 0x00ff0c, fga = 1, alc = 0xff0000, ala = 1,
-            alarm = 75, led_effect = true, led_alpha = 1, rotation = 90
+            w = 10, h = 2, space = 1, bgc = 0x303030, bga = 0.3, fgc = 0x00ff00, fga = 1,
+            yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
+            alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
             xb = 55, yb = 421, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
-            w = 10, h = 2, space = 1, bgc = 0x606070, bga = 1, fgc = 0x00ff0c, fga = 1, alc = 0xff0000, ala = 1,
-            alarm = 75, led_effect = true, led_alpha = 1, rotation = 90
+            w = 10, h = 2, space = 1, bgc = 0x303030, bga = 0.3, fgc = 0x00ff00, fga = 1,
+            yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
+            alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
             xb = 55, yb = 481, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 69,
-            cap = CAIRO_LINE_CAP_SQUARE, w = 10, h = 2, space = 1, bgc = 0x606070, bga = 1, fgc = 0x00ff0c, fga = 1,
-            alc = 0xff0000, ala = 1, alarm = 75, led_effect = true, led_alpha = 1, rotation = 90
+            cap = CAIRO_LINE_CAP_SQUARE, w = 10, h = 2, space = 1, bgc = 0x303030, bga = 0.3, fgc = 0x00ff00, fga = 1,
+            yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
+            alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
             xb = 55, yb = 524, name = 'swapperc', arg = '', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
-            w = 10, h = 2, space = 1, bgc = 0x606070, bga = 1, fgc = 0x00ff0c, fga = 1, alc = 0xff0000, ala = 1,
-            alarm = 75, led_effect = true, led_alpha = 1, rotation = 90
+            w = 10, h = 2, space = 1, bgc = 0x303030, bga = 0.3, fgc = 0x00ff00, fga = 1,
+            yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
+            alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         }
     }
 
