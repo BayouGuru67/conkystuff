@@ -80,26 +80,26 @@ function conky_sysbars_widgets()
     -- Equalizer parameters for each bar
     local equalizer_params = {
         {
-            xb = 55, yb = 255, name = 'memperc', arg = '', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
-            w = 10, h = 2, space = 1, bgc = 0x303030, bga = 0.3, fgc = 0x00ff00, fga = 1,
+            xb = 55, yb = 298, name = 'memperc', arg = '', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
+            w = 10, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 55, yb = 421, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
-            w = 10, h = 2, space = 1, bgc = 0x303030, bga = 0.3, fgc = 0x00ff00, fga = 1,
+            xb = 55, yb = 466, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
+            w = 10, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 55, yb = 481, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 69,
-            cap = CAIRO_LINE_CAP_SQUARE, w = 10, h = 2, space = 1, bgc = 0x303030, bga = 0.3, fgc = 0x00ff00, fga = 1,
+            xb = 55, yb = 526, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 69,
+            cap = CAIRO_LINE_CAP_SQUARE, w = 10, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 55, yb = 524, name = 'swapperc', arg = '', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
-            w = 10, h = 2, space = 1, bgc = 0x303030, bga = 0.3, fgc = 0x00ff00, fga = 1,
+            xb = 55, yb = 570, name = 'swapperc', arg = '', max = 100, nb_blocks = 69, cap = CAIRO_LINE_CAP_SQUARE,
+            w = 10, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         }

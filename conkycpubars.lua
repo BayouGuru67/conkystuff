@@ -75,8 +75,8 @@ function conky_conkycpubars_widgets()
     local cr = cairo_create(cs)
 
     -- Bright LED colors
-    local bgc = 0x303030  -- Darker gray background
-    local bga = 0.3
+    local bgc = 0x404040  -- Darker gray background
+    local bga = 0.7
     local fgc = 0x00ff00  -- Bright green
     local fga = 1
     local alc = 0xff0000  -- Bright red
