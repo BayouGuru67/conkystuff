@@ -1,4 +1,3 @@
--- sysbars.lua
 require 'cairo'
 require 'cairo_xlib'
 
@@ -33,6 +32,36 @@ local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alph
     end
 
     cairo_stroke(cr)
+end
+
+-- Helper function: Draw LEDs
+local function draw_led(cr, x, y, state, thresholds)
+    local color, alpha
+
+if state == "CapsLock" then
+    color = thresholds[state] and 0xff0000 or 0x00ff00 -- Red for on, green for off
+    alpha = 1.0
+elseif state == "NumLock" then
+    color = thresholds[state] and 0x00ff00 or 0xff0000 -- Green for on, red for off
+    alpha = 1.0
+else
+    if state <= thresholds.green then
+        color, alpha = 0x00ff00, 1.0 -- Green
+    elseif state >= thresholds.red then
+        color, alpha = 0xff0000, 1.0 -- Red
+    else
+        color, alpha = 0xffff00, 1.0 -- Yellow
+    end
+end
+
+    local radius = 7 -- Adjusted radius for smaller LEDs
+    local pat = cairo_pattern_create_radial(x, y, 0, x, y, radius)
+    cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(color, alpha))
+    cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(color, 0.1))
+    cairo_set_source(cr, pat)
+    cairo_arc(cr, x, y, radius, 0, 2 * math.pi)
+    cairo_fill(cr)
+    cairo_pattern_destroy(pat)
 end
 
 -- Main function: Draw equalizer bars
@@ -105,9 +134,41 @@ function conky_sysbars_widgets()
         }
     }
 
+    -- LED thresholds
+    local led_thresholds = {
+        green = 75,
+        red = 90,
+        CapsLock = conky_parse('${if_match "${key_caps_lock}" == "Off"}true${else}false${endif}') == "false",
+        NumLock = conky_parse('${if_match "${key_num_lock}" == "On"}true${else}false${endif}') == "true"
+    }
+
+    -- LED positions
+    local led_positions = {
+        {x = 142, y = 44, state = "CapsLock", thresholds = led_thresholds},
+        {x = 254, y = 44, state = "NumLock", thresholds = led_thresholds},
+        {x = 198, y = 138, state = tonumber(conky_parse('${hwmon 4 temp 1}')), thresholds = {green = 90, red = 120}},
+        {x = 198, y = 153, state = tonumber(conky_parse('${hwmon 1 temp 1}')), thresholds = {green = 110, red = 125}},
+        {x = 198, y = 168, state = tonumber(conky_parse('${hwmon 1 temp 2}')), thresholds = {green = 100, red = 80}},
+        {x = 198, y = 183, state = tonumber(conky_parse('${hwmon 0 temp 1}')), thresholds = {green = 110, red = 80}},
+        {x = 198, y = 198, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 95, red = 110}},
+        {x = 198, y = 213, state = tonumber(conky_parse('${hwmon 3 temp 1}')), thresholds = {green = 80, red = 100}},
+        {x = 198, y = 319, state = tonumber(conky_parse('${memperc}')), thresholds = led_thresholds},
+        {x = 26, y = 442, state = tonumber(conky_parse('${fs_used_perc /}')), thresholds = led_thresholds},
+        {x = 198, y = 448, state = tonumber(conky_parse('${fs_used_perc /}')), thresholds = led_thresholds},
+        {x = 26, y = 505, state = tonumber(conky_parse('${fs_used_perc /home/bayouguru/N-1Tb/}')), thresholds = led_thresholds},
+        {x = 198, y = 508, state = tonumber(conky_parse('${fs_used_perc /home/bayouguru/N-1Tb/}')), thresholds = led_thresholds},
+        {x = 26, y = 556, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds},
+        {x = 198, y = 546, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds}
+    }
+
     -- Draw each bar
     for _, params in ipairs(equalizer_params) do
         equalizer(cr, params)
+    end
+
+    -- Draw LEDs
+    for _, led in ipairs(led_positions) do
+        draw_led(cr, led.x, led.y, led.state, led.thresholds)
     end
 
     -- Clean up
