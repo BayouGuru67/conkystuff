@@ -115,19 +115,19 @@ function conky_sysbars_widgets()
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 467, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 49, yb = 437, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 527, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 72,
+            xb = 49, yb = 497, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 72,
             cap = CAIRO_LINE_CAP_SQUARE, w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 571, name = 'swapperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 49, yb = 557, name = 'swapperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
@@ -153,12 +153,7 @@ function conky_sysbars_widgets()
         {x = 198, y = 198, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 95, red = 110}},
         {x = 198, y = 213, state = tonumber(conky_parse('${hwmon 3 temp 1}')), thresholds = {green = 80, red = 100}},
         {x = 198, y = 319, state = tonumber(conky_parse('${memperc}')), thresholds = led_thresholds},
-        {x = 26, y = 442, state = tonumber(conky_parse('${fs_used_perc /}')), thresholds = led_thresholds},
-        {x = 198, y = 448, state = tonumber(conky_parse('${fs_used_perc /}')), thresholds = led_thresholds},
-        {x = 26, y = 505, state = tonumber(conky_parse('${fs_used_perc /home/bayouguru/N-1Tb/}')), thresholds = led_thresholds},
-        {x = 198, y = 508, state = tonumber(conky_parse('${fs_used_perc /home/bayouguru/N-1Tb/}')), thresholds = led_thresholds},
-        {x = 26, y = 556, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds},
-        {x = 198, y = 546, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds}
+        {x = 26, y = 561, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds},
     }
 
     -- Draw each bar
