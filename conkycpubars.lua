@@ -28,33 +28,28 @@ function equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc,
 
     -- Render the percentage
     if show_percentage then
-        -- Reset drawing path to ensure the correct application of font and color
         cairo_new_path(cr)
 
-        -- Set the custom font (Larabiefont, bold, size 12)
         cairo_select_font_face(cr, "Larabiefont", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD)
-        cairo_set_font_size(cr, 12)  -- Set font size to 12
+        cairo_set_font_size(cr, 13)
 
-        -- Set the color to orange for the percentage number
-        cairo_set_source_rgba(cr, 1, 0.647, 0, 1)  -- Orange (RGBA)
+        cairo_set_source_rgba(cr, 1, 0.647, 0, 1)
 
-        -- Move to the position and render the percentage number
-        local num_x_pos = 6
+        local num_x_pos = xb
         if pct < 10 then
-            num_x_pos = num_x_pos + 2  -- Move slightly to the right for 1-digit percentages
+            num_x_pos = xb + 16
+        elseif pct < 100 then
+            num_x_pos = xb + 8
         end
-        cairo_move_to(cr, num_x_pos, 169)
-        cairo_show_text(cr, string.format('%d', pct))  -- Render only the number part
+        cairo_move_to(cr, num_x_pos, yb + 9)
+        cairo_show_text(cr, string.format('%d', pct))
 
-        -- Set the color to light blue for the percentage symbol
-        cairo_set_source_rgba(cr, 0.678, 0.847, 0.902, 1)  -- Light blue (RGBA)
+        cairo_set_source_rgba(cr, 0.678, 0.847, 0.902, 1)
 
-        -- Move the position slightly and render the percentage symbol
-        cairo_move_to(cr, 6 + 11 * 1.5, 169)  -- Move a fixed amount for the percentage symbol
-        cairo_show_text(cr, "%")  -- Render the percentage symbol
+        cairo_move_to(cr, xb + 26, yb + 9)
+        cairo_show_text(cr, "%")
 
-        -- Adjust the position for the next block
-        xb = xb + 32
+        xb = xb + 34
     end
 
     cairo_set_line_width(cr, h)
@@ -112,18 +107,15 @@ function conky_conkycpubars_widgets()
     local bars = {
         {4, 25, 'cpu1'}, {136, 25, 'cpu2'},
         {4, 54, 'cpu3'}, {136, 54, 'cpu4'},
-        {4, 85, 'cpu5'}, {136, 85, 'cpu6'},
-        {4, 116, 'cpu0', 86}
+        {4, 84, 'cpu5'}, {136, 84, 'cpu6'},
+        {4, 115, 'cpu0', 86}
     }
 
-    -- Fetch GPU usage once
     local gpu_pct = tonumber(conky_parse('${execi 1 cat /sys/class/drm/card1/device/gpu_busy_percent}')) or 0
 
-    -- Only call equalizer for GPU once and pass both graphical bar and numeric percentage
-    equalizer(cr, 0, 160, 'execi 1', 'cat /sys/class/drm/card1/device/gpu_busy_percent', 100, 77, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,
+    equalizer(cr, 9, 167, 'execi 1', 'cat /sys/class/drm/card1/device/gpu_busy_percent', 100, 73, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,
               bgc, bga, fgc, fga, alc, ala, alarm, true, 0.8, 90, true)
 
-    -- Add the CPU bars
     for i, bar in ipairs(bars) do
         local x, y, cpu_label, width = bar[1], bar[2], bar[3], bar[4] or 42
         equalizer(cr, x, y, 'cpu', cpu_label, 100, width, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,

@@ -146,14 +146,14 @@ function conky_sysbars_widgets()
     local led_positions = {
         {x = 142, y = 44, state = "CapsLock", thresholds = led_thresholds},
         {x = 254, y = 44, state = "NumLock", thresholds = led_thresholds},
-        {x = 198, y = 138, state = tonumber(conky_parse('${hwmon 4 temp 1}')), thresholds = {green = 90, red = 120}},
-        {x = 198, y = 153, state = tonumber(conky_parse('${hwmon 1 temp 1}')), thresholds = {green = 110, red = 125}},
-        {x = 198, y = 168, state = tonumber(conky_parse('${hwmon 1 temp 2}')), thresholds = {green = 100, red = 80}},
-        {x = 198, y = 183, state = tonumber(conky_parse('${hwmon 0 temp 1}')), thresholds = {green = 110, red = 80}},
-        {x = 198, y = 198, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 95, red = 110}},
-        {x = 198, y = 213, state = tonumber(conky_parse('${hwmon 3 temp 1}')), thresholds = {green = 80, red = 100}},
-        {x = 198, y = 319, state = tonumber(conky_parse('${memperc}')), thresholds = led_thresholds},
-        {x = 26, y = 561, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds},
+        {x = 198, y = 137, state = tonumber(conky_parse('${hwmon 4 temp 1}')), thresholds = {green = 90, red = 120}},
+        {x = 198, y = 152, state = tonumber(conky_parse('${hwmon 1 temp 1}')), thresholds = {green = 110, red = 125}},
+        {x = 198, y = 167, state = tonumber(conky_parse('${hwmon 1 temp 2}')), thresholds = {green = 100, red = 80}},
+        {x = 198, y = 182, state = tonumber(conky_parse('${hwmon 0 temp 1}')), thresholds = {green = 110, red = 80}},
+        {x = 198, y = 197, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 95, red = 110}},
+        {x = 198, y = 212, state = tonumber(conky_parse('${hwmon 3 temp 1}')), thresholds = {green = 80, red = 100}},
+        {x = 198, y = 318, state = tonumber(conky_parse('${memperc}')), thresholds = led_thresholds},
+        {x = 26, y = 559, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds},
     }
 
     -- Draw each bar
