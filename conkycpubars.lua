@@ -113,8 +113,8 @@ function conky_conkycpubars_widgets()
 
     local gpu_pct = tonumber(conky_parse('${execi 1 cat /sys/class/drm/card1/device/gpu_busy_percent}')) or 0
 
-    equalizer(cr, 9, 167, 'execi 1', 'cat /sys/class/drm/card1/device/gpu_busy_percent', 100, 73, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,
-              bgc, bga, fgc, fga, alc, ala, alarm, true, 0.8, 90, true)
+equalizer(cr, 9, 167, '', '', gpu_pct, 73, CAIRO_LINE_CAP_SQUARE, 8, 2, 1)
+bgc, bga, fgc, fga, alc, ala, alarm, true, 0.8, 90, true)
 
     for i, bar in ipairs(bars) do
         local x, y, cpu_label, width = bar[1], bar[2], bar[3], bar[4] or 42
