@@ -21,7 +21,7 @@ function calculate_color(pct)
 end
 
 function equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc, bga, fgc, fga, alc, ala, alarm, led_effect, led_alpha, rotation, show_percentage)
-    local str = conky_parse(string.format('${%s %s}', name, arg))
+    local str = conky_parse(string.format('${%s %s}', name, arg))  -- Now using Conky's internal parsing
     local value = tonumber(str) or 0
     local pct = 100 * value / max
     local pcb = 100 / nb_blocks
@@ -106,16 +106,16 @@ function conky_conkycpubars_widgets()
 
     local bars = {
         {4, 25, 'cpu1'}, {136, 25, 'cpu2'},
-        {4, 54, 'cpu3'}, {136, 54, 'cpu4'},
-        {4, 84, 'cpu5'}, {136, 84, 'cpu6'},
-        {4, 115, 'cpu0', 86}
+        {4, 52, 'cpu3'}, {136, 52, 'cpu4'},
+        {4, 80, 'cpu5'}, {136, 80, 'cpu6'},
+        {4, 108, 'cpu0', 86}
     }
 
-    local gpu_pct = tonumber(conky_parse('${execi 1 cat /sys/class/drm/card1/device/gpu_busy_percent}')) or 0
+    -- GPU usage directly handled by Conky execi
+    equalizer(cr, 9, 156, 'execi 1', 'cat /sys/class/drm/card1/device/gpu_busy_percent', 100, 73, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,
+              bgc, bga, fgc, fga, alc, ala, alarm, true, 0.8, 90, true)
 
-equalizer(cr, 9, 167, '', '', gpu_pct, 73, CAIRO_LINE_CAP_SQUARE, 8, 2, 1)
-bgc, bga, fgc, fga, alc, ala, alarm, true, 0.8, 90, true)
-
+    -- Process CPU usage bars
     for i, bar in ipairs(bars) do
         local x, y, cpu_label, width = bar[1], bar[2], bar[3], bar[4] or 42
         equalizer(cr, x, y, 'cpu', cpu_label, 100, width, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,
