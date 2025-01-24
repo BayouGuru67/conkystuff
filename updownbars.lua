@@ -79,7 +79,7 @@ function conky_updownbars_widgets()
     -- Parameters for upload and download bars
     local bars = {
         {
-            xb = 65, yb = 326, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 79,
+            xb = 65, yb = 221, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 79,
             cap = CAIRO_LINE_CAP_SQUARE, w = 11, h = 2, space = 1,
             bgc = 0x404040, bga = 0.7,
             fgc = 0x00ff00, fga = 1,  -- Bright green
@@ -89,7 +89,7 @@ function conky_updownbars_widgets()
             led_effect = true, led_alpha = 0.8, rotation = 90
         },
         {
-            xb = 65, yb = 342, name = 'downspeedf', arg = 'enp4s0', max = 50000, nb_blocks = 79,
+            xb = 65, yb = 237, name = 'downspeedf', arg = 'enp4s0', max = 50000, nb_blocks = 79,
             cap = CAIRO_LINE_CAP_SQUARE, w = 11, h = 2, space = 1,
             bgc = 0x404040, bga = 0.7,
             fgc = 0x00ff00, fga = 1,  -- Bright green

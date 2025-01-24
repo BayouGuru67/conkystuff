@@ -21,12 +21,12 @@ function calculate_color(pct)
 end
 
 function equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc, bga, fgc, fga, alc, ala, alarm, led_effect, led_alpha, rotation, show_percentage)
-    local str = conky_parse(string.format('${%s %s}', name, arg))  -- Now using Conky's internal parsing
+    local str = conky_parse(string.format('${%s %s}', name, arg))
     local value = tonumber(str) or 0
     local pct = 100 * value / max
     local pcb = 100 / nb_blocks
 
-    -- Render the percentage
+    -- Render the percentage with adjusted spacing
     if show_percentage then
         cairo_new_path(cr)
 
@@ -35,21 +35,21 @@ function equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space, bgc,
 
         cairo_set_source_rgba(cr, 1, 0.647, 0, 1)
 
-        local num_x_pos = xb
+        local num_x_pos = xb + 10  -- Shifted right for alignment
         if pct < 10 then
-            num_x_pos = xb + 16
+            num_x_pos = xb + 26
         elseif pct < 100 then
-            num_x_pos = xb + 8
+            num_x_pos = xb + 18
         end
         cairo_move_to(cr, num_x_pos, yb + 9)
         cairo_show_text(cr, string.format('%d', pct))
 
         cairo_set_source_rgba(cr, 0.678, 0.847, 0.902, 1)
 
-        cairo_move_to(cr, xb + 26, yb + 9)
+        cairo_move_to(cr, xb + 36, yb + 9) -- Shifted percentage symbol to align
         cairo_show_text(cr, "%")
 
-        xb = xb + 34
+        xb = xb + 44  -- Adjust bar start position to match shortened numeric section
     end
 
     cairo_set_line_width(cr, h)
@@ -105,17 +105,16 @@ function conky_conkycpubars_widgets()
     local alarm = 75
 
     local bars = {
-        {4, 25, 'cpu1'}, {136, 25, 'cpu2'},
-        {4, 52, 'cpu3'}, {136, 52, 'cpu4'},
-        {4, 80, 'cpu5'}, {136, 80, 'cpu6'},
-        {4, 108, 'cpu0', 86}
+        {4, 26, 'cpu1'}, {136, 26, 'cpu2'},
+        {4, 54, 'cpu3'}, {136, 54, 'cpu4'},
+        {4, 82, 'cpu5'}, {136, 82, 'cpu6'},
+        {4, 110, 'cpu0', 86}
     }
 
-    -- GPU usage directly handled by Conky execi
-    equalizer(cr, 9, 156, 'execi 1', 'cat /sys/class/drm/card1/device/gpu_busy_percent', 100, 73, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,
+    -- Adjusted GPU usage display for alignment
+    equalizer(cr, 9, 159, 'exec', 'cat /sys/class/drm/card1/device/gpu_busy_percent', 100, 70, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,
               bgc, bga, fgc, fga, alc, ala, alarm, true, 0.8, 90, true)
 
-    -- Process CPU usage bars
     for i, bar in ipairs(bars) do
         local x, y, cpu_label, width = bar[1], bar[2], bar[3], bar[4] or 42
         equalizer(cr, x, y, 'cpu', cpu_label, 100, width, CAIRO_LINE_CAP_SQUARE, 8, 2, 1,

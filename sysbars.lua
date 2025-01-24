@@ -54,7 +54,7 @@ else
     end
 end
 
-    local radius = 7 -- Adjusted radius for smaller LEDs
+    local radius = 8 -- Adjusted radius for smaller LEDs
     local pat = cairo_pattern_create_radial(x, y, 0, x, y, radius)
     cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(color, alpha))
     cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(color, 0.1))
@@ -109,25 +109,25 @@ function conky_sysbars_widgets()
     -- Equalizer parameters for each bar
     local equalizer_params = {
         {
-            xb = 49, yb = 301, name = 'memperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 49, yb = 188, name = 'memperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 437, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 49, yb = 316, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 497, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 72,
+            xb = 49, yb = 380, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 72,
             cap = CAIRO_LINE_CAP_SQUARE, w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 557, name = 'swapperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 49, yb = 444, name = 'swapperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
@@ -144,16 +144,11 @@ function conky_sysbars_widgets()
 
     -- LED positions
     local led_positions = {
-        {x = 142, y = 44, state = "CapsLock", thresholds = led_thresholds},
-        {x = 254, y = 44, state = "NumLock", thresholds = led_thresholds},
-        {x = 198, y = 137, state = tonumber(conky_parse('${hwmon 4 temp 1}')), thresholds = {green = 90, red = 120}},
-        {x = 198, y = 152, state = tonumber(conky_parse('${hwmon 1 temp 1}')), thresholds = {green = 110, red = 125}},
-        {x = 198, y = 167, state = tonumber(conky_parse('${hwmon 1 temp 2}')), thresholds = {green = 100, red = 80}},
-        {x = 198, y = 182, state = tonumber(conky_parse('${hwmon 0 temp 1}')), thresholds = {green = 110, red = 80}},
-        {x = 198, y = 197, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 95, red = 110}},
-        {x = 198, y = 212, state = tonumber(conky_parse('${hwmon 3 temp 1}')), thresholds = {green = 80, red = 100}},
-        {x = 198, y = 318, state = tonumber(conky_parse('${memperc}')), thresholds = led_thresholds},
-        {x = 26, y = 559, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds},
+        {x = 142, y = 46, state = "CapsLock", thresholds = led_thresholds},
+        {x = 253, y = 46, state = "NumLock", thresholds = led_thresholds},
+        {x = 26, y = 350, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 95, red = 110}},
+        {x = 26, y = 414, state = tonumber(conky_parse('${hwmon 3 temp 1}')), thresholds = {green = 80, red = 100}},
+        {x = 26, y = 447, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds},
     }
 
     -- Draw each bar
