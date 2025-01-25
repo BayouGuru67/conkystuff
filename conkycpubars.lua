@@ -121,6 +121,39 @@ function conky_conkycpubars_widgets()
                   bgc, bga, fgc, fga, alc, ala, alarm, true, 0.8, 90, false)
     end
 
+    -- Helper function: Draw LEDs
+    local function draw_led(cr, x, y, state, thresholds)
+        local color, alpha
+
+        if state <= thresholds.green then
+            color, alpha = 0x00ff00, 1.0 -- Green
+        elseif state >= thresholds.red then
+            color, alpha = 0xff0000, 1.0 -- Red
+        else
+            color, alpha = 0xffff00, 1.0 -- Yellow
+        end
+
+        local radius = 8 -- Adjusted radius for smaller LEDs
+        local pat = cairo_pattern_create_radial(x, y, 0, x, y, radius)
+        cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(color, alpha))
+        cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(color, 0.1))
+        cairo_set_source(cr, pat)
+        cairo_arc(cr, x, y, radius, 0, 2 * math.pi)
+        cairo_fill(cr)
+        cairo_pattern_destroy(pat)
+    end
+
+    -- LED positions and thresholds
+    local led_positions = {
+        {x = 210, y = 15, state = tonumber(conky_parse('${hwmon 4 temp 1}')), thresholds = {green = 140, red = 155}},
+        {x = 210, y = 147, state = tonumber(conky_parse('${hwmon 0 temp 1}')), thresholds = {green = 170, red = 190}}
+    }
+
+    -- Draw LEDs
+    for _, led in ipairs(led_positions) do
+        draw_led(cr, led.x, led.y, led.state, led.thresholds)
+    end
+
     cairo_destroy(cr)
     cairo_surface_destroy(cs)
 end

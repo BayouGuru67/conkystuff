@@ -144,6 +144,8 @@ function conky_sysbars_widgets()
 
     -- LED positions
     local led_positions = {
+        {x = 78, y = 14, state = tonumber(conky_parse('${hwmon 1 temp 1}')), thresholds = {green = 140, red = 160}},
+        {x = 182, y = 14, state = tonumber(conky_parse('${hwmon 1 temp 2}')), thresholds = {green = 120, red = 148}},
         {x = 142, y = 46, state = "CapsLock", thresholds = led_thresholds},
         {x = 253, y = 46, state = "NumLock", thresholds = led_thresholds},
         {x = 26, y = 350, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 95, red = 110}},
