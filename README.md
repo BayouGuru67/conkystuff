@@ -1,7 +1,7 @@
 # conkystuff
 BayouGuru's online conky repository
 
-This repository contains all of the currently active conkys on BayouGuru's main system.  There are 4 conkys and 3 lua scripts, named as follows:
+This repository contains all of the currently active conkys on BayouGuru's main system.  There are 3 conkys and 3 lua scripts as follows:
 
 "l-conky-clock.conf" - The clock conky at the left-top of the screen. *DEVELOPMENT DISCONTINUED* I have a perfectly good clock in the tray.  Why duplicfate the effort?
 
@@ -9,9 +9,11 @@ This repository contains all of the currently active conkys on BayouGuru's main 
 
 "l-conky-sysinfo.conf" - The System Informaton conky.
 
-"conkycpubars.lua" - The Lua script which is responsible for rendering the cool looking segmented LED bars in the CPU conky.  You will need to edit this file as-needed for the particulars of your hardware setup.
+"rightconky.conf" - This conky monitors all network activity and provides network and critical system file versioning information.
 
-"sysbars.lua" - The Lua script which is responsible for rendering the cool looking segmented LED bars in the Sytem Information conky.  You will need to edit this file as-needed for the particulars of your hardware setup.  This also draws the round "LED indictors", and the threshold data is located in the table at the end of the lua.
+"conkycpubars.lua" - The Lua script which is responsible for rendering the cool looking segmented LED bars and round glowy LED's in the CPU conky.  You will need to edit this file as-needed for the particulars of your hardware setup.
+
+"sysbars.lua" - The Lua script which is responsible for rendering the cool looking segmented LED bars and round glowy LED's in the Sytem Information conky.  You will need to edit this file as-needed for the particulars of your hardware setup.  This also draws the round "LED indictors", and the threshold data is located in the table at the end of the lua.
 
 "updownbars.lua" - The Lua script which is responsible for rendering the cool looking segmented LED bars in the Network (right) conky.  You will need to edit this file as-needed for the particulars of your hardware setup.
 
