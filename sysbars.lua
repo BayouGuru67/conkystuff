@@ -6,7 +6,7 @@ local function rgb_to_r_g_b(colour, alpha)
     return ((colour / 0x10000) % 0x100) / 255., ((colour / 0x100) % 0x100) / 255., (colour % 0x100) / 255., alpha
 end
 
--- Helper function: Draw a single block
+-- Helper function: Draw a single block with 3D effect and LED effect
 local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alpha)
     local xx0, xx1, yy0, yy1
     if angle == 90 or angle == 270 then
@@ -17,42 +17,49 @@ local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alph
         yy0, yy1 = y2, y2 + w * math.sin(angle)
     end
 
+    -- 3D Gradient Effect
+    local pat = cairo_pattern_create_linear(xx0, yy0, xx0, yy1)
+    cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, alpha * 0.6))  -- Darker top
+    cairo_pattern_add_color_stop_rgba(pat, 0.5, rgb_to_r_g_b(col, alpha))      -- Normal middle
+    cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha * 0.6))  -- Darker bottom
+    cairo_set_source(cr, pat)
+
     cairo_move_to(cr, xx0, yy0)
     cairo_line_to(cr, xx1, yy1)
+    cairo_stroke(cr)
+    cairo_pattern_destroy(pat)
 
+    -- Optional LED Effect Overlay
     if led_effect then
         local xc, yc = (xx0 + xx1) / 2, (yy0 + yy1) / 2
-        local pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w / 1.5)
-        cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, led_alpha))
-        cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha))
-        cairo_set_source(cr, pat)
-        cairo_pattern_destroy(pat)
-    else
-        cairo_set_source_rgba(cr, rgb_to_r_g_b(col, alpha))
+        local led_pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w / 2)
+        cairo_pattern_add_color_stop_rgba(led_pat, 0, rgb_to_r_g_b(col, led_alpha))
+        cairo_pattern_add_color_stop_rgba(led_pat, 1, rgb_to_r_g_b(col, alpha))
+        cairo_set_source(cr, led_pat)
+        cairo_stroke(cr)
+        cairo_pattern_destroy(led_pat)
     end
-
-    cairo_stroke(cr)
 end
 
 -- Helper function: Draw LEDs
 local function draw_led(cr, x, y, state, thresholds)
     local color, alpha
 
-if state == "CapsLock" then
-    color = thresholds[state] and 0xff0000 or 0x00ff00 -- Red for on, green for off
-    alpha = 1.0
-elseif state == "NumLock" then
-    color = thresholds[state] and 0x00ff00 or 0xff0000 -- Green for on, red for off
-    alpha = 1.0
-else
-    if state <= thresholds.green then
-        color, alpha = 0x00ff00, 1.0 -- Green
-    elseif state >= thresholds.red then
-        color, alpha = 0xff0000, 1.0 -- Red
+    if state == "CapsLock" then
+        color = thresholds[state] and 0xff0000 or 0x00ff00 -- Red for on, green for off
+        alpha = 1.0
+    elseif state == "NumLock" then
+        color = thresholds[state] and 0x00ff00 or 0xff0000 -- Green for on, red for off
+        alpha = 1.0
     else
-        color, alpha = 0xffff00, 1.0 -- Yellow
+        if state <= thresholds.green then
+            color, alpha = 0x00ff00, 1.0 -- Green
+        elseif state >= thresholds.red then
+            color, alpha = 0xff0000, 1.0 -- Red
+        else
+            color, alpha = 0xffff00, 1.0 -- Yellow
+        end
     end
-end
 
     local radius = 8 -- Adjusted radius for smaller LEDs
     local pat = cairo_pattern_create_radial(x, y, 0, x, y, radius)
@@ -109,25 +116,25 @@ function conky_sysbars_widgets()
     -- Equalizer parameters for each bar
     local equalizer_params = {
         {
-            xb = 49, yb = 188, name = 'memperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 49, yb = 186, name = 'memperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 316, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 49, yb = 312, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 380, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 72,
+            xb = 49, yb = 376, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 72,
             cap = CAIRO_LINE_CAP_SQUARE, w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 444, name = 'swapperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 49, yb = 440, name = 'swapperc', arg = '', max = 100, nb_blocks = 72, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 2, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
@@ -148,8 +155,8 @@ function conky_sysbars_widgets()
         {x = 182, y = 14, state = tonumber(conky_parse('${hwmon 1 temp 2}')), thresholds = {green = 120, red = 148}},
         {x = 142, y = 46, state = "CapsLock", thresholds = led_thresholds},
         {x = 253, y = 46, state = "NumLock", thresholds = led_thresholds},
-        {x = 26, y = 350, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 95, red = 110}},
-        {x = 26, y = 414, state = tonumber(conky_parse('${hwmon 3 temp 1}')), thresholds = {green = 80, red = 100}},
+        {x = 26, y = 346, state = tonumber(conky_parse('${hwmon 2 temp 1}')), thresholds = {green = 120, red = 140}},
+        {x = 26, y = 410, state = tonumber(conky_parse('${hwmon 3 temp 1}')), thresholds = {green = 120, red = 140}},
         {x = 26, y = 447, state = tonumber(conky_parse('${swapperc}')), thresholds = led_thresholds},
     }
 

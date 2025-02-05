@@ -7,7 +7,7 @@ local function rgb_to_r_g_b(colour, alpha)
     return ((colour / 0x10000) % 0x100) / 255., ((colour / 0x100) % 0x100) / 255., (colour % 0x100) / 255., alpha
 end
 
--- Helper function: Draw a single block with LED effect
+-- Helper function: Draw a single block with LED and 3D effect
 local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alpha)
     local xx0, xx1, yy0, yy1
     if angle == 90 or angle == 270 then
@@ -18,21 +18,28 @@ local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alph
         yy0, yy1 = y2, y2 + w * math.sin(angle)
     end
 
+    -- 3D Gradient Effect
+    local pat = cairo_pattern_create_linear(xx0, yy0, xx0, yy1)
+    cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, alpha * 0.6))  -- Darker top
+    cairo_pattern_add_color_stop_rgba(pat, 0.5, rgb_to_r_g_b(col, alpha))      -- Normal middle
+    cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha * 0.6))  -- Darker bottom
+    cairo_set_source(cr, pat)
+
     cairo_move_to(cr, xx0, yy0)
     cairo_line_to(cr, xx1, yy1)
+    cairo_stroke(cr)
+    cairo_pattern_destroy(pat)
 
+    -- Optional LED Effect Overlay
     if led_effect then
         local xc, yc = (xx0 + xx1) / 2, (yy0 + yy1) / 2
-        local pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w / 2)
-        cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, led_alpha))
-        cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha))
-        cairo_set_source(cr, pat)
-        cairo_pattern_destroy(pat)
-    else
-        cairo_set_source_rgba(cr, rgb_to_r_g_b(col, alpha))
+        local led_pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w / 2)
+        cairo_pattern_add_color_stop_rgba(led_pat, 0, rgb_to_r_g_b(col, led_alpha))
+        cairo_pattern_add_color_stop_rgba(led_pat, 1, rgb_to_r_g_b(col, alpha))
+        cairo_set_source(cr, led_pat)
+        cairo_stroke(cr)
+        cairo_pattern_destroy(led_pat)
     end
-
-    cairo_stroke(cr)
 end
 
 -- Main function: Draw equalizer bars
