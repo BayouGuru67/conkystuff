@@ -97,7 +97,7 @@ function conky_conkycpubars_widgets()
     local cr = cairo_create(cs)
 
     local bgc = 0x404040
-    local bga = 0.7
+    local bga = 0.8
     local fgc = 0x00ff00
     local fga = 1
     local alc = 0xff0000

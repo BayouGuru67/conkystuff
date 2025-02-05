@@ -1,4 +1,4 @@
--- updownbars.lua
+-- log_updownbars.lua
 require 'cairo'
 require 'cairo_xlib'
 
@@ -39,7 +39,12 @@ end
 local function updownbars_equalizer(cr, params)
     local str = conky_parse(string.format('${%s %s}', params.name, params.arg))
     local value = tonumber(str) or 0
-    local pct = 100 * value / params.max
+
+    -- Apply logarithmic scaling
+    local log_value = value > 0 and math.log(value + 1) or 0
+    local log_max = math.log(params.max + 1)
+    local pct = 100 * log_value / log_max
+
     local pcb = 100 / params.nb_blocks
 
     cairo_set_line_width(cr, params.h)
@@ -79,8 +84,8 @@ function conky_updownbars_widgets()
     -- Parameters for upload and download bars
     local bars = {
         {
-            xb = 65, yb = 221, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 79,
-            cap = CAIRO_LINE_CAP_SQUARE, w = 11, h = 2, space = 1,
+            xb = 65, yb = 220, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 79,
+            cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 2, space = 1,
             bgc = 0x404040, bga = 0.7,
             fgc = 0x00ff00, fga = 1,  -- Bright green
             wc = 0xffff00, wa = 1,   -- Bright yellow
@@ -89,8 +94,8 @@ function conky_updownbars_widgets()
             led_effect = true, led_alpha = 0.8, rotation = 90
         },
         {
-            xb = 65, yb = 237, name = 'downspeedf', arg = 'enp4s0', max = 50000, nb_blocks = 79,
-            cap = CAIRO_LINE_CAP_SQUARE, w = 11, h = 2, space = 1,
+            xb = 65, yb = 236, name = 'downspeedf', arg = 'enp4s0', max = 100000, nb_blocks = 79,
+            cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 2, space = 1,
             bgc = 0x404040, bga = 0.7,
             fgc = 0x00ff00, fga = 1,  -- Bright green
             wc = 0xffff00, wa = 1,   -- Bright yellow
