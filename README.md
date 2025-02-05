@@ -9,7 +9,7 @@ This repository contains all of the currently active conkys on BayouGuru's main 
 
 "l-conky-sysinfo.conf" - The System Informaton conky.
 
-"rightconky.conf" - This conky monitors all network activity and provides network and critical system file versioning information.
+"rightconky.conf" - This conky monitors all network activity and provides network and critical system file versioning information.  The network throughput LED lua bars now use logarithmic scaling for more reactivity on faster connections at slower speeds.
 
 "conkycpubars.lua" - The Lua script which is responsible for rendering the cool looking segmented LED bars and round glowy LED's in the CPU conky.  You will need to edit this file as-needed for the particulars of your hardware setup.
 
