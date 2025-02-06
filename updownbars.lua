@@ -20,9 +20,9 @@ local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alph
 
     -- 3D Gradient Effect
     local pat = cairo_pattern_create_linear(xx0, yy0, xx0, yy1)
-    cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, alpha * 0.6))  -- Darker top
+    cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, alpha * 0.4))  -- Darker top
     cairo_pattern_add_color_stop_rgba(pat, 0.5, rgb_to_r_g_b(col, alpha))      -- Normal middle
-    cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha * 0.6))  -- Darker bottom
+    cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha * 0.4))  -- Darker bottom
     cairo_set_source(cr, pat)
 
     cairo_move_to(cr, xx0, yy0)
@@ -97,7 +97,7 @@ function conky_updownbars_widgets()
             fgc = 0x00ff00, fga = 1,  -- Bright green
             wc = 0xffff00, wa = 1,   -- Bright yellow
             alc = 0xff0000, ala = 1, -- Bright red
-            warning = 50, alarm = 80,
+            warning = 75, alarm = 90,
             led_effect = true, led_alpha = 0.8, rotation = 90
         },
         {
@@ -107,7 +107,7 @@ function conky_updownbars_widgets()
             fgc = 0x00ff00, fga = 1,  -- Bright green
             wc = 0xffff00, wa = 1,   -- Bright yellow
             alc = 0xff0000, ala = 1, -- Bright red
-            warning = 50, alarm = 80,
+            warning = 75, alarm = 90,
             led_effect = true, led_alpha = 0.8, rotation = 90
         }
     }

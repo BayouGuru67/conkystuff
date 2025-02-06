@@ -31,9 +31,9 @@ function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alpha)
 
     -- 3D Gradient Effect
     local pat = cairo_pattern_create_linear(xx0, yy0, xx0, yy1)
-    cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, alpha * 0.6))  -- Darker top
+    cairo_pattern_add_color_stop_rgba(pat, 0, rgb_to_r_g_b(col, alpha * 0.4))  -- Darker top
     cairo_pattern_add_color_stop_rgba(pat, 0.5, rgb_to_r_g_b(col, alpha))      -- Normal middle
-    cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha * 0.6))  -- Darker bottom
+    cairo_pattern_add_color_stop_rgba(pat, 1, rgb_to_r_g_b(col, alpha * 0.4))  -- Darker bottom
     cairo_set_source(cr, pat)
 
     cairo_move_to(cr, xx0, yy0)
