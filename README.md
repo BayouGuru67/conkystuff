@@ -3,8 +3,6 @@ BayouGuru's online conky repository
 
 This repository contains all of the currently active conkys on BayouGuru's main system.  There are 3 conkys and 3 lua scripts as follows:
 
-"l-conky-clock.conf" - The clock conky at the left-top of the screen. *DEVELOPMENT DISCONTINUED* I have a perfectly good clock in the tray.  Why duplicfate the effort?
-
 "l-conky-cpu.conf" - The CPU section conky.  Displays the CPU Core and Average usage, GPU Usage, GPU Core and Memory frequencies. This conky is aligned to the top-left corner andupdates every .5 second.
 
 "l-conky-sysinfo.conf" - The System Informaton conky, which gives Uptime, Toggleable keys, Update, Connected devices, RAM, SSD and Swap information.  This conky aligns on the left side just under the CPU/GPU conky.
