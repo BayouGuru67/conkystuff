@@ -15,9 +15,9 @@ It is certain that you WILL need to edit both the .conf and the associated .lua 
 There are 3 conkys and 3 lua scripts here, grouped and listed as follows:
 
 CPU/GPU Usage Conky and Lua:
-"l-conky-cpu.conf" - The CPU section conky.  Displays the CPU Core and Average usage, GPU Usage and the GPU Core and Memory frequencies. This conky requires a lua-enabled buildof conky and is aligned to the top-left corner and updates every .5 second, but still uses less than 1% CPU.
+"l-conky-cpu.conf" - The CPU conky displays the CPU Core and Average usage, GPU Usage, the GPU Core and GPU Memory frequencies. This conky  is aligned to the top-left corner of the screen and updates every half-second, but still uses less than 1.4% CPU.
 ...AND...
-"conkycpubars.lua" - The Lua script which is responsible for rendering the cool 3-D-looking segmented LED bars and round glowy LED's in the CPU conky.  You will need to edit this file as-needed for the particulars of your hardware setup.  These bars use a linear scale.
+"conkycpubars.lua" - The Lua script which is responsible for rendering the cool 3-D-looking segmented LED bars and round glowy LED's in the CPU/GPU conky.  You will need to edit this file as-needed for the particulars of your hardware setup.  These bars use a linear scale.
 
 System Information Conky and Lua:
 "l-conky-sysinfo.conf" - The big System Informaton conky which is aligned to the left side of the screen, just under the cpu conky. It gives a ton of system information, including: Uptime, Toggleable keys status, pending Updates, Connected devices, RAM, SSD and Swap information as well as the top 7 RAM- and CPU-eating processes.  This conky updates once per second.
