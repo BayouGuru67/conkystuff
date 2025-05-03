@@ -1,4 +1,3 @@
--- log_updownbars.lua
 require 'cairo'
 require 'cairo_xlib'
 
@@ -44,20 +43,20 @@ end
 
 -- Main function: Draw equalizer bars
 local function updownbars_equalizer(cr, params)
-    local str = conky_parse(string.format('${%s %s}', params.name, params.arg))
-    local value = tonumber(str) or 0
+    -- Parse and calculate value once, instead of on each block
+    local value = tonumber(conky_parse(string.format('${%s %s}', params.name, params.arg))) or 0
 
-    -- Apply logarithmic scaling
+    -- Apply logarithmic scaling only once
     local log_value = value > 0 and math.log(value + 1) or 0
     local log_max = math.log(params.max + 1)
     local pct = 100 * log_value / log_max
 
     local pcb = 100 / params.nb_blocks
+    local angle = params.rotation * math.pi / 180
 
     cairo_set_line_width(cr, params.h)
     cairo_set_line_cap(cr, params.cap)
 
-    local angle = params.rotation * math.pi / 180
     for pt = 1, params.nb_blocks do
         local blockStartPercentage = (pt - 1) * pcb
         local col, alpha = params.bgc, params.bga
@@ -91,7 +90,7 @@ function conky_updownbars_widgets()
     -- Parameters for upload and download bars
     local bars = {
         {
-            xb = 65, yb = 222, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 78,
+            xb = 60, yb = 222, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 80,
             cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 2, space = 1,
             bgc = 0x404040, bga = 0.7,
             fgc = 0x00ff00, fga = 1,  -- Bright green
@@ -101,7 +100,7 @@ function conky_updownbars_widgets()
             led_effect = true, led_alpha = 0.8, rotation = 90
         },
         {
-            xb = 65, yb = 238, name = 'downspeedf', arg = 'enp4s0', max = 100000, nb_blocks = 78,
+            xb = 60, yb = 240, name = 'downspeedf', arg = 'enp4s0', max = 100000, nb_blocks = 80,
             cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 2, space = 1,
             bgc = 0x404040, bga = 0.7,
             fgc = 0x00ff00, fga = 1,  -- Bright green
