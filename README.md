@@ -12,7 +12,7 @@ There is an application called Conky Manager that is used to manage conky themes
 
 It is certain that you WILL need to edit both the .conf and the associated .lua file for each conky in order to make them work on your system. I have added comments at the top of the conky .conf files that lists how my specific hardware setup correlates to the output of "sensors" and the contents of the /sys/class/hwmon/hwmon0-5 directories, which should serve to make reconfiguring my conkys to work properly with your system easier.  I would recommend starting by looking at the screenshot of the conky you're editing, comparing that to the text of the .conf and .lua files in your favorite code editor.  Cross reference that with the output of "sensors" (install "lm-sensors" if you do not have it already) and the changes you will need to make should become pretty obvious.  To make editing easier, there are syntax highlighting files for conky configs available for VS Code, Kate, nano and vim.  
 
-There are 3 conkys and 3 lua scripts here, grouped and listed as follows:
+There are 4 conkys, 3 lua scripts and  bash shell script here, grouped and listed as follows:
 
 CPU/GPU Usage Conky and Lua:
 "l-conky-cpu.conf" - The CPU conky displays the CPU Core and Average usage, GPU Usage, the GPU Core and GPU Memory frequencies. This conky  is aligned to the top-left corner of the screen and updates every half-second, but still uses less than 1.4% CPU.
@@ -23,6 +23,8 @@ System Information Conky and Lua:
 "l-conky-sysinfo.conf" - The big System Informaton conky which is aligned to the left side of the screen, just under the cpu conky. It gives a ton of system information, including: Uptime, Toggleable keys status, pending Updates, Connected devices, RAM, SSD and Swap information as well as the top 7 RAM- and CPU-eating processes.  This conky updates once per second.
 ...AND...
 "sysbars.lua" - The Lua script which is responsible for rendering the cool 3-D-looking segmented LED bars in the conky.  This also draws the round "LED indictors", and the threshold data is located in the table at the end of the lua.  You will need to edit this file as-needed for the particulars of your hardware setup.  These bars use a linear scale.
+...AND...
+"anifan.conf" - This config file loads and displays the animated fan image over the system info conky.
 
 Right/Network Conky and Lua:
 "rightconky.conf" - This conky monitors all network activity and provides network connectivity and system file versioning information.  This conky  lists the current versions of my Kubuntu system's major software, such as the KDE Plasma DE, Mesa, conky, pipewire, X11, Linux Kernel... and very importantly, it lists the IP, port and hostname of up to 25 outgoing and 6 incoming network connections in a list that prioritizes the incoming connections at the top, followed by up to 25 outgoing connections (minus the number of incoming connections listed, so you would see 19 outbound connections if there were 6 or more incoming connections active).  To put it another way, the connections list is trimmed automatically to fit a maximum of 25 connections on-screen, which is what fits on my 1080p display, leaving just enough room for the system's menu bar, which I have at the bottom of my screen. This conky is programmed to be 300 pixels wide and take up the entire vertical space on the right side of my 1080p60 HTPC display.  Nothing connects to my system via the network without me knowing all about it with this conky!
