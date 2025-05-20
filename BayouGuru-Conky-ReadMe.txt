@@ -1,5 +1,5 @@
 BayouGuru's Conky ReadMe!
-Version 3-27-2024.0740
+Version 2025-5-20.1009
 
 This ReadMe is for the conky collection created a bit at a time as inspiration 
 or necessity struck for the machine known as "bg-l-box", property of 
@@ -31,42 +31,42 @@ template that converts the raw sensors output to each sensors more human-
 readable format. It also helped a lot to install "psensor" and "radeon-
 profile", the latter being used to control the GPU fan speeds on my AMD RX580.
 
-The average observed CPU usage to run these conkys on this system is about 
-1%-2% for the left conky (updating once per second) and .5% to 1% for the 
-right conky (updating once every 2 seconds.)  The files are stored in the 
-following directories:
+The average observed CPU usage to run these conkys on this system is now .5% to
+.8% for all of the conkys!  
 
-
-    All of the files are in the /home/bayouguru/.conky/ directory or
+    All of the files are in the ~/.conky/ directory or
     subfolders therein, with the sole exception of the conky executable.
     BE SURE to replicate this directory structure, and edit the configuration
     files appropriately by replacing "bayouguru" with the appropriate value for
     your system.
         
-        ~/.conky/conky.conf -
-        The left conky's configuration file (conky.conf) displays the CPU 
-        info, system uptime, pending updates, load averages, temperature,
-        fan, RAM and storage usage information.
+        ~/.conky/l-conky-cpu.conf -
+        The conky's configuration file displays the CPU and GPU
+        info.
+
+        ~/.conky/l-conky-sysinfo.conf - 
+        This is the lower portion of the system information conky which displays
+        the temperature, uptime, disk as well as the top memory and cpu users and
+        much more.
+
+        ~/.conky/anifan.conf - 
+        This conky displays the animated fan over the system info conky next to 
+        where it lists the current fan speeds.
 
         ~/.conky/rightconky.conf -
-        The right conky's configuration file (rightconky.conf) has the active 
-        processes, top 5 RAM and CPU processes, the network info and the list 
-        of up to 6 incoming and 18 outgoing connections, minus the incoming 
-        connections, as it is set to display no more than 18 total.  The 
-        conky now no longer uses negative voffsets to remove blank space, as
-        I have finally figured out the use of the "\" in the config, which 
-        is a tricky one.  Don't mess with the line break formatting of the 
-        conky or the list won't display correctly, trust me!  If you want 
-        to use this config, search and replace the 6 instances my network 
-        adapter name of "enp6s0" with the name of your network adapter.
-        This conky also features the lua upload and download bars.
-        Designed to fit on a 1080p screen, this conky should be easily
-        expandable to work equally well on higher resolution displays,
-        yielding the option to show even more connections.  Just follow the
-        logic and layout pattern already established and enjoy!
+        The right conky's configuration file (rightconky.conf) has the network info
+        and the list of up to 6 incoming and 25 outgoing connections, minus the 
+        incoming connections, as it displays no more than 25 total connections due 
+        to vertical space limitations.  If you want to use this config, search and
+        replace all of the instances of my network adapter name of "enp6s0" with 
+        the name of your network adapter.  This conky also features the lua upload 
+        and download bars.  Designed to fit on a 1080p screen, this conky should be
+        easily expandable to work equally well on higher-resolution displays,
+        showing even more connections.  Just follow the logic and layout pattern 
+        already established and have fun!
     
         The images/icons used are all in the ~/.conky/images/ subdirectory.  
-        There are currently ~10 images & icons used between the 2 conkys.
+        There are currently ~12 images & icons used between all of the conkys.
         
         ~/.conky/conkybars.lua - 
         The left conky uses lua to make the really cool looking segmented bars.
@@ -83,20 +83,20 @@ following directories:
         The right conky uses lua to make the really cool looking segmented bars
         showing the upload and download loads.
         You will need to edit this script as-appropriate for your system, as
-        it contains the information for my particular setup.        
-        
-        There is 1 script in the /scripts/ subdirectory.
+        it contains the information for my particular setup.
+
+        ~/.conky/conky-startup.sh
+        This is a bash script that loads my conkys at startup (or whenever).
+        In order to start all of my conkys automatically at boot, I wrote this
+        script and linked to it in Kubuntu's AutoRun.
             
-            hostname.sh is a bash shell script that retrieves the WAN 
-                hostname.
-            
-These conkys use the following fonts:
+My conkys use the following fonts:
     Arial                   - Used for the ANSI
     Larabiefont-Regular     - The main font used throughout
     Ubuntu Condensed        - Used in the right conky on those long hostnames 
                               in the connections list so they'll fit on one line.        
         
-That's it for this set of conkys! I do hope you find something useful in them! 
+That's it! I do hope you find something useful in these conkys! 
 They were/are in a constant state of evolution as I get better at working with
 the conky config file syntax and incorporating the various external items.
 
@@ -105,15 +105,5 @@ as-is so that if you wish to edit this conky for your own use, you can and shoul
 feel free to do so.  Pay attention to the file modified dates on Google Drive
 or Dropbox, as these conkys are still a work in progress as I continue to learn.
 
-NOTE:  The weather conky, the ipv6 script and the 2 hard drive scripts have all 
-been discontinued for various reasons and are no longer supported.  
-    The ipv6 script is no longer necessary. 
-    The hard drive scripts were too annoying (HDD light blinking every second/
-refresh and permission issues after updates) 
-    The weather script has been discontinued due to the constantly 
-changing nature of the various weather providers' API's/sites and the 
-availability of better weather apps for my Plasma desktop.
-
 If you require some assistance or explanations, please feel free to find me on
-reddit, email or sometimes on IRC as BayouGuru or BayouGuru67 at 
-https://libera.chat in the #conky channel.
+reddit, discord or via email: bayouguru67<at>gmail.com.
