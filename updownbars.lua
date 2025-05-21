@@ -41,6 +41,12 @@ local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alph
     end
 end
 
+-- Check if network is connected on the given interface
+local function is_network_connected(interface)
+    local ip = conky_parse('${addr ' .. interface .. '}')
+    return ip and ip ~= '' and ip ~= '0.0.0.0'
+end
+
 -- Main function: Draw equalizer bars
 local function updownbars_equalizer(cr, params)
     -- Parse and calculate value once, instead of on each block
@@ -82,6 +88,9 @@ end
 -- Main Conky widget function
 function conky_updownbars_widgets()
     if conky_window == nil then return end
+
+    -- Check connection on the interface used by bars (assumes same interface for all)
+    if not is_network_connected('enp4s0') then return end
 
     -- Create surface and context
     local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable, conky_window.visual, conky_window.width, conky_window.height)
