@@ -1,6 +1,7 @@
 require 'cairo'
 require 'cairo_xlib'
 
+
 -- Helper function: Convert hex color to RGBA
 local function rgb_to_r_g_b(colour, alpha)
     return ((colour / 0x10000) % 0x100) / 255., ((colour / 0x100) % 0x100) / 255., (colour % 0x100) / 255., alpha
@@ -105,8 +106,44 @@ local function equalizer(cr, params)
     end
 end
 
+function conky_draw_pre()
+    if conky_window == nil then return end
+
+    local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable,
+               conky_window.visual, conky_window.width, conky_window.height)
+    local cr = cairo_create(cs)
+
+    -- Parameters (adjust Y-values to match your layout)
+    local ram_start_y = 490  -- Y-position of first RAM process line
+    local cpu_start_y = 665  -- Y-position of first CPU process line
+    local line_height = 16   -- Height of each line
+    local total_width = 256  -- Width of stripes
+    local stripe_color = {0.12, 0.12, 0.12, 0.7} -- Dark gray, semi-transparent
+
+    -- Draw RAM stripes (every other line)
+    for i = 0, 9 do
+        if i % 2 == 1 then
+            cairo_set_source_rgba(cr, stripe_color[1], stripe_color[2], stripe_color[3], stripe_color[4])
+            cairo_rectangle(cr, 13, ram_start_y + (i * line_height), total_width, line_height)
+            cairo_fill(cr)
+        end
+    end
+
+    -- Draw CPU stripes (every other line)
+    for i = 0, 9 do
+        if i % 2 == 1 then
+            cairo_set_source_rgba(cr, stripe_color[1], stripe_color[2], stripe_color[3], stripe_color[4])
+            cairo_rectangle(cr, 13, cpu_start_y + (i * line_height), total_width, line_height)
+            cairo_fill(cr)
+        end
+    end
+
+    cairo_destroy(cr)
+    cairo_surface_destroy(cs)
+end
+
 -- Main Conky widget function
-function conky_sysbars_widgets()
+function conky_draw_post()
     if conky_window == nil then return end
 
     -- Create surface and context
