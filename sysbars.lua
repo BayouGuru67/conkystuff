@@ -118,7 +118,7 @@ function conky_draw_pre()
     local cpu_start_y = 665  -- Y-position of first CPU process line
     local line_height = 16   -- Height of each line
     local total_width = 256  -- Width of stripes
-    local stripe_color = {0.12, 0.12, 0.12, 0.7} -- Dark gray, semi-transparent
+    local stripe_color = {0.15, 0.15, 0.15, 0.7} -- Dark gray, semi-transparent
 
     -- Draw RAM stripes (every other line)
     for i = 0, 9 do

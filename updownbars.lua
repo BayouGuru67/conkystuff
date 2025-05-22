@@ -55,15 +55,15 @@ function conky_draw_pre()
 
     -- Background stripe parameters
     local start_x = 13
-    local start_y = 267
+    local start_y = 268
     local pair_height = 30
-    local total_width = 290
+    local total_width = 294
 
     local in_count = tonumber(conky_parse("${tcp_portmon 1 32767 count}")) or 0
     local out_count = tonumber(conky_parse("${tcp_portmon 32768 61000 count}")) or 0
     local total_pairs = math.max(in_count, out_count)
 
-    cairo_set_source_rgba(cr, 0.12, 0.12, 0.12, 0.7)
+    cairo_set_source_rgba(cr, 0.15, 0.15, 0.15, 0.7)
 
     for i = 0, total_pairs - 1 do
         if i % 2 == 1 then
