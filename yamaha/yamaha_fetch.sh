@@ -46,14 +46,19 @@ else
   fi
   echo "$input_title_processed"                                       # 3 Title
 
-# Extract the <Val> under <Volume><Lvl>
-volume_raw_val=$(echo "$basic_status_content" | sed -n 's/.*<Volume>.*<Lvl>.*<Val>\([-0-9]*\)<\/Val>.*/\1/p' | head -n1)
-if [[ "$volume_raw_val" != "" && "$volume_raw_val" != "N/A" ]]; then
-    printf "%.1f\n" "$(bc -l <<< "$volume_raw_val / 10")"
-else
-    echo "N/A"
-fi
+# Extract just the <Volume> block from Basic_Status (first occurrence, non-greedy)
+volume_block=$(echo "$basic_status_content" | grep -o '<Volume>.*</Volume>' | head -n1)
+volume_raw_val=$(echo "$volume_block" | grep -o '<Val>[^<]*</Val>' | head -n1 | sed -e 's/<[^>]*>//g')
 
+# Debug output
+echo "DEBUG: VOLUME BLOCK: $volume_block" >&2
+echo "DEBUG: VOLUME RAW VAL: $volume_raw_val" >&2
+
+if [[ "$volume_raw_val" != "N/A" && -n "$volume_raw_val" && "$volume_raw_val" =~ ^-?[0-9]+$ ]]; then
+  printf "%.1f\n" "$(bc -l <<< "$volume_raw_val / 10")"
+else
+  echo "N/A"
+fi
   echo "$(extract_simple_tag "$basic_status_content" "Mute")"         # 5 Mute
   echo "$(extract_simple_tag "$basic_status_content" "Sound_Program")" # 6 Program
   echo "$(extract_simple_tag "$basic_status_content" "Straight")"     # 7 Straight
