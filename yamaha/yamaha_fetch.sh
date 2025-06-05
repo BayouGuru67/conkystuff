@@ -46,12 +46,13 @@ else
   fi
   echo "$input_title_processed"                                       # 3 Title
 
-  volume_raw_val=$(extract_simple_tag "$basic_status_content" "Val")
-  if [[ "$volume_raw_val" != "N/A" && -n "$volume_raw_val" && "$volume_raw_val" =~ ^-?[0-9]+$ ]]; then
+# Extract the <Val> under <Volume><Lvl>
+volume_raw_val=$(echo "$basic_status_content" | sed -n 's/.*<Volume>.*<Lvl>.*<Val>\([-0-9]*\)<\/Val>.*/\1/p' | head -n1)
+if [[ "$volume_raw_val" != "" && "$volume_raw_val" != "N/A" ]]; then
     printf "%.1f\n" "$(bc -l <<< "$volume_raw_val / 10")"
-  else
+else
     echo "N/A"
-  fi                                                                  # 4 Volume
+fi
 
   echo "$(extract_simple_tag "$basic_status_content" "Mute")"         # 5 Mute
   echo "$(extract_simple_tag "$basic_status_content" "Sound_Program")" # 6 Program
