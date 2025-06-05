@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Fetch data from your Yamaha receiver
-yamaha_data=($(~/.conky/yamaha/yamaha_fetch.sh))
+IFS=$'\n' read -d '' -r -a yamaha_data < <(~/.conky/yamaha/yamaha_fetch.sh)
 
-# Output formatted Conky text
 cat <<EOF
 \${color4}\${font Larabiefont-Regular:bold:size=11}Yamaha RX-A840 \${voffset -2}\${color6}\${hr 2}
 \${template3}├ \${template1}Power\${goto 125}\${color2}\${template2}${yamaha_data[0]}
@@ -27,4 +25,5 @@ cat <<EOF
 \${template3}├ \${template1}Input\${goto 125}\${color2}\${template2}${yamaha_data[17]}
 \${template3}├ \${template1}Title\${goto 125}\${color2}\${template2}${yamaha_data[18]}
 \${template3}├ \${template1}Volume\${goto 125}\${color2}\${template2}${yamaha_data[19]} dB
-\${template3}└ \${template1}Mute\${goto 125}\${color2}\${template2}${yamaha_data[20]}EOF
+\${template3}└ \${template1}Mute\${goto 125}\${color2}\${template2}${yamaha_data[20]}
+EOF
