@@ -22,4 +22,9 @@ cat <<EOF
 \${template3}├ \${template1}DRC\${goto 125}\${color2}\${template2}${yamaha_data[13]}
 \${template3}├ \${template1}Dialog Level\${goto 125}\${color2}\${template2}${yamaha_data[14]}
 \${template3}└ \${template1}Dialog Lift\${goto 125}\${color2}\${template2}${yamaha_data[15]}
-EOF
+\${color4}\${font Larabiefont-Regular:bold:size=11}Zone 2 \${color6}\${hr 2}
+\${template3}├ \${template1}Power\${goto 125}\${color2}\${template2}${yamaha_data[16]}
+\${template3}├ \${template1}Input\${goto 125}\${color2}\${template2}${yamaha_data[17]}
+\${template3}├ \${template1}Title\${goto 125}\${color2}\${template2}${yamaha_data[18]}
+\${template3}├ \${template1}Volume\${goto 125}\${color2}\${template2}${yamaha_data[19]} dB
+\${template3}└ \${template1}Mute\${goto 125}\${color2}\${template2}${yamaha_data[20]}EOF

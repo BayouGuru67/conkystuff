@@ -21,6 +21,14 @@ if [ -z "$basic_status_content" ]; then
   exit 0
 fi
 
+# Fetch Zone_2 status
+zone2_raw_xml_data=$(curl -s "http://192.168.1.106/YamahaRemoteControl/ctrl" \
+  -d '<YAMAHA_AV cmd="GET"><Zone_2><Basic_Status>GetParam</Basic_Status></Zone_2></YAMAHA_AV>')
+
+# Extract the content of <Basic_Status> for Zone_2
+zone2_basic_status_content=$(echo "$zone2_raw_xml_data" | sed -n 's#.*<Basic_Status>\(.*\)</Basic_Status>.*#\1#p')
+
+
 # Function to extract content of a simple XML tag from a given xml string
 # Usage: extract_simple_tag "$xml_string_to_search" "TagName"
 extract_simple_tag() {
@@ -42,7 +50,7 @@ extract_simple_tag() {
   fi
 }
 
-# --- Specific getter functions based on your provided XML structure ---
+# --- Specific getter functions based on Yamaha XML structure ---
 
 get_power() {
     local power_control_xml=$(extract_simple_tag "$basic_status_content" "Power_Control")
@@ -126,9 +134,29 @@ get_dialog_lift() {
     local dia_adj_xml=$(extract_simple_tag "$sound_video_xml" "Dialogue_Adjust")
     extract_simple_tag "$dia_adj_xml" "Dialogue_Lift"
 }
-
+get_zone2_power() {
+  local power_control_xml=$(extract_simple_tag "$zone2_basic_status_content" "Power_Control")
+  extract_simple_tag "$power_control_xml" "Power"
+}
+get_zone2_input_sel() {
+  local input_xml=$(extract_simple_tag "$zone2_basic_status_content" "Input")
+  extract_simple_tag "$input_xml" "Input_Sel"
+}
+get_zone2_input_title() {
+  local input_xml=$(extract_simple_tag "$zone2_basic_status_content" "Input")
+  local item_info_xml=$(extract_simple_tag "$input_xml" "Input_Sel_Item_Info")
+  extract_simple_tag "$item_info_xml" "Title"
+}
+get_zone2_volume_val_raw() {
+  local volume_xml=$(extract_simple_tag "$zone2_basic_status_content" "Volume")
+  local lvl_xml=$(extract_simple_tag "$volume_xml" "Lvl")
+  extract_simple_tag "$lvl_xml" "Val"
+}
+get_zone2_mute() {
+  local volume_xml=$(extract_simple_tag "$zone2_basic_status_content" "Volume")
+  extract_simple_tag "$volume_xml" "Mute"
+}
 # --- Output each value on a new line, applying processing ---
-
 # Line 1: Power
 echo "$(get_power)"
 
@@ -203,3 +231,8 @@ if [[ "$dialog_lift_raw" != "N/A" && "$dialog_lift_raw" =~ ^-?[0-9]+$ ]]; then
 else
     echo "N/A"
 fi
+echo "$(get_zone2_power)"
+echo "$(get_zone2_input_sel)"
+echo "$(get_zone2_input_title)"
+echo "$(get_zone2_volume_val_raw)"
+echo "$(get_zone2_mute)"
