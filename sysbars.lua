@@ -61,28 +61,28 @@ local function draw_led(cr, x, y, state, thresholds)
     local r, g, b
 
     if state == "CapsLock" then
-        color_hex = thresholds[state] and 0xff0000 or 0x00ff00 -- Red for on, green for off
+        color_hex = thresholds[state] and 0xff0000 or 0x00ff00
         alpha = 1.0
     elseif state == "NumLock" then
-        color_hex = thresholds[state] and 0x00ff00 or 0xff0000 -- Green for on, red for off
+        color_hex = thresholds[state] and 0x00ff00 or 0xff0000
         alpha = 1.0
     else
         if state <= thresholds.green then
-            color_hex, alpha = 0x00ff00, 1.0 -- Green
+            color_hex, alpha = 0x00ff00, 1.0
         elseif state >= thresholds.red then
-            color_hex, alpha = 0xff0000, 1.0 -- Red
+            color_hex, alpha = 0xff0000, 1.0
         else
-            color_hex, alpha = 0xffff00, 1.0 -- Yellow
+            color_hex, alpha = 0xffff00, 1.0
         end
     end
 
-    -- Pre-calculate RGB components for the chosen color.
     r, g, b = rgb_to_r_g_b_components(color_hex)
 
-    local radius = 8 -- Adjusted radius for smaller LEDs
+    local radius = 8
     local pat = cairo_pattern_create_radial(x, y, 0, x, y, radius)
-    cairo_pattern_add_color_stop_rgba(pat, 0, r, g, b, alpha)
-    cairo_pattern_add_color_stop_rgba(pat, 1, r, g, b, 0.1)
+    cairo_pattern_add_color_stop_rgba(pat, 0.0, r, g, b, alpha)
+    cairo_pattern_add_color_stop_rgba(pat, 0.5, r, g, b, alpha)
+    cairo_pattern_add_color_stop_rgba(pat, 1.0, r, g, b, 0.0) -- sharper edge
     cairo_set_source(cr, pat)
     cairo_arc(cr, x, y, radius, 0, 2 * math.pi)
     cairo_fill(cr)

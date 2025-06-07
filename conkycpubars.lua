@@ -126,7 +126,7 @@ local function equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space
     end
 end
 
--- Draw status LEDs with proper color handling
+-- Draw status LEDs with sharper, less hazy look
 local function draw_led(cr, x, y, state, thresholds)
     local color_hex, base_alpha = 0x000000, 1
 
@@ -143,9 +143,9 @@ local function draw_led(cr, x, y, state, thresholds)
     local r_led, g_led, b_led = rgb_to_r_g_b(color_hex, 1)
     local radius = 8
     local pat = cairo_pattern_create_radial(x, y, 0, x, y, radius)
-    cairo_pattern_add_color_stop_rgba(pat, 0, r_led, g_led, b_led, base_alpha)
-    cairo_pattern_add_color_stop_rgba(pat, 0.7, r_led, g_led, b_led, base_alpha*0.5)
-    cairo_pattern_add_color_stop_rgba(pat, 1, r_led, g_led, b_led, 0.0)
+    cairo_pattern_add_color_stop_rgba(pat, 0.0, r_led, g_led, b_led, base_alpha)
+    cairo_pattern_add_color_stop_rgba(pat, 0.5, r_led, g_led, b_led, base_alpha)
+    cairo_pattern_add_color_stop_rgba(pat, 1.0, r_led, g_led, b_led, 0.0)
     cairo_set_source(cr, pat)
     cairo_arc(cr, x, y, radius, 0, 2 * math.pi)
     cairo_fill(cr)
