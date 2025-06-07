@@ -30,21 +30,6 @@ local function rgb_to_r_g_b(colour, alpha)
     return r, g, b, alpha
 end
 
--- Utility: Color based on usage percentage
-local function calculate_color(pct)
-    if type(pct) ~= "number" then
-        return 0xff0000, 1 -- Default to red if invalid
-    end
-
-    if pct < 75 then
-        return 0x00ff00, 1 -- Green
-    elseif pct <= 90 then
-        return 0xffff00, 1 -- Yellow
-    else
-        return 0xff0000, 1 -- Red
-    end
-end
-
 -- Draw a gradient "bar block"
 local function draw_block(cr, x2, y2, w, angle, col, alpha, led_effect, led_alpha)
     local xx1 = x2 + w * math.cos(angle)
@@ -84,6 +69,9 @@ local function equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space
     local pcb = 100 / nb_blocks
     local angle = precalculated_angle
 
+    local yellow_threshold = 75
+    local red_threshold = 90
+
     if show_percentage then
         cairo_new_path(cr)
         cairo_select_font_face(cr, "Larabiefont", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD)
@@ -114,10 +102,12 @@ local function equalizer(cr, xb, yb, name, arg, max, nb_blocks, cap, w, h, space
         local block_pct_threshold = (pt - 1) * pcb
         local col, current_alpha
         if pct >= block_pct_threshold then
-            if alarm > 0 and pct >= alarm then
-                col, current_alpha = calculate_color(pct)
+            if block_pct_threshold < yellow_threshold then
+                col, current_alpha = 0x00ff00, 1 -- Green
+            elseif block_pct_threshold < red_threshold then
+                col, current_alpha = 0xffff00, 1 -- Yellow
             else
-                col, current_alpha = fgc, fga
+                col, current_alpha = 0xff0000, 1 -- Red
             end
         else
             col, current_alpha = bgc, bga

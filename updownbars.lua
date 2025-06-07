@@ -15,9 +15,6 @@ end
 local function draw_block(cr, x2, y2, w, cos_angle, sin_angle, r, g, b, alpha, led_effect, led_alpha)
     local xx0, xx1, yy0, yy1
 
-    -- Determine block endpoints using pre-calculated sine and cosine.
-    -- This replaces the conditional logic for 90/270 degrees, as the general
-    -- formula works for all angles when sin/cos are correctly provided.
     xx0, xx1 = x2, x2 + w * cos_angle
     yy0, yy1 = y2, y2 + w * sin_angle
 
@@ -37,7 +34,6 @@ local function draw_block(cr, x2, y2, w, cos_angle, sin_angle, r, g, b, alpha, l
     if led_effect then
         local xc, yc = (xx0 + xx1)/2, (yy0 + yy1)/2
         local led_pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w/2)
-        -- Reuse the same RGB components for the LED effect
         cairo_pattern_add_color_stop_rgba(led_pat, 0, r, g, b, led_alpha)
         cairo_pattern_add_color_stop_rgba(led_pat, 1, r, g, b, alpha)
         cairo_set_source(cr, led_pat)
@@ -123,15 +119,12 @@ function conky_draw_post()
         local value = tonumber(conky_parse(string.format('${%s %s}', params.name, params.arg))) or 0
         local log_value = value > 0 and math.log(value + 1) or 0
 
-        -- Cache _log_max and _angle (already present and good)
         params._log_max = params._log_max or math.log(params.max + 1)
-        params._angle = params._angle or (params.rotation * RAD_TO_DEG) -- Use global RAD_TO_DEG
+        params._angle = params._angle or (params.rotation * RAD_TO_DEG)
 
-        -- Pre-calculate sine and cosine of the angle once per bar
         local cos_angle = math.cos(params._angle)
         local sin_angle = math.sin(params._angle)
 
-        -- Pre-calculate RGB components for all possible colors once per bar
         local r_bgc, g_bgc, b_bgc = get_rgb_components(params.bgc)
         local r_fgc, g_fgc, b_fgc = get_rgb_components(params.fgc)
         local r_wc, g_wc, b_wc = get_rgb_components(params.wc)
@@ -140,6 +133,9 @@ function conky_draw_post()
         local pct = 100 * log_value / params._log_max
         local pcb = 100 / params.nb_blocks
 
+        local yellow_threshold = params.warning
+        local red_threshold = params.alarm
+
         cairo_set_line_width(cr, params.h)
         cairo_set_line_cap(cr, params.cap)
 
@@ -147,13 +143,13 @@ function conky_draw_post()
             local blockStartPercentage = (pt - 1) * pcb
             local current_r, current_g, current_b, current_alpha
 
-            -- Determine current color and alpha based on percentage
             if pct >= blockStartPercentage then
-                current_r, current_g, current_b, current_alpha = r_fgc, g_fgc, b_fgc, params.fga
-                if pct >= params.warning and pct < params.alarm then
-                    current_r, current_g, current_b, current_alpha = r_wc, g_wc, b_wc, params.wa
-                elseif pct >= params.alarm then
-                    current_r, current_g, current_b, current_alpha = r_alc, g_alc, b_alc, params.ala
+                if blockStartPercentage < yellow_threshold then
+                    current_r, current_g, current_b, current_alpha = r_fgc, g_fgc, b_fgc, params.fga -- Green
+                elseif blockStartPercentage < red_threshold then
+                    current_r, current_g, current_b, current_alpha = r_wc, g_wc, b_wc, params.wa     -- Yellow
+                else
+                    current_r, current_g, current_b, current_alpha = r_alc, g_alc, b_alc, params.ala -- Red
                 end
             else
                 current_r, current_g, current_b, current_alpha = r_bgc, g_bgc, b_bgc, params.bga
@@ -164,7 +160,6 @@ function conky_draw_post()
             local x2 = params.xb + radius0 * sin_angle
             local y2 = params.yb - radius0 * cos_angle
 
-            -- Pass pre-calculated RGB, sine, and cosine to draw_block
             draw_block(cr, x2, y2, params.w, cos_angle, sin_angle,
                        current_r, current_g, current_b, current_alpha,
                        params.led_effect, params.led_alpha)
