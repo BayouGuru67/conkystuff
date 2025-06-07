@@ -102,16 +102,16 @@ function conky_draw_post()
     -- Speed bars configuration
     local bars = {
         {
-            xb = 60, yb = 222, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 80,
-            cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 2, space = 1,
+            xb = 60, yb = 222, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 48,
+            cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 4, space = 1,
             bgc = 0x404040, bga = 0.8,
             fgc = 0x00ff00, fga = 1, wc = 0xffff00, wa = 1,
             alc = 0xff0000, ala = 1, warning = 75, alarm = 90,
             led_effect = true, led_alpha = 0.8, rotation = 90
         },
         {
-            xb = 60, yb = 240, name = 'downspeedf', arg = 'enp4s0', max = 100000, nb_blocks = 80,
-            cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 2, space = 1,
+            xb = 60, yb = 240, name = 'downspeedf', arg = 'enp4s0', max = 100000, nb_blocks = 48,
+            cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 4, space = 1,
             bgc = 0x404040, bga = 0.8,
             fgc = 0x00ff00, fga = 1, wc = 0xffff00, wa = 1,
             alc = 0xff0000, ala = 1, warning = 75, alarm = 90,
