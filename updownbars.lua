@@ -51,6 +51,39 @@ local function is_network_connected_cached()
     return _G.cached_is_network_connected
 end
 
+function conky_limit_connections(max_in, max_total)
+    local in_count = tonumber(conky_parse("${tcp_portmon 1 32767 count}"))
+    local out_count = tonumber(conky_parse("${tcp_portmon 32768 61000 count}"))
+
+    -- Limit incoming connections to max_in
+    in_count = math.min(in_count, max_in)
+
+    -- Calculate how many outgoing connections we can show without exceeding max_total
+    local out_to_show = math.min(out_count, max_total - in_count)
+
+    -- Display incoming connections
+    for i = 0, in_count - 1 do
+        if i >= max_in then break end
+
+        local rip = conky_parse("${tcp_portmon 1 32768 rip " .. i .. "}")
+        local rservice = conky_parse("${tcp_portmon 1 32768 rservice " .. i .. "}")
+        local rhost = conky_parse("${tcp_portmon 1 32768 rhost " .. i .. "}")
+
+        print("${goto 4}${color6}${voffset -1}${template4}├${color yellow}${template2}In${template4} ←${color2} ${template2}" .. rip .. "${alignr 4}" .. rservice)
+        print("${voffset -1}${goto 4}${template4}└ ${color3}${template3}" .. rhost)
+    end
+
+    -- Display outgoing connections
+    for i = 0, out_to_show - 1 do
+        local rip = conky_parse("${tcp_portmon 32768 61000 rip " .. i .. "}")
+        local rservice = conky_parse("${tcp_portmon 32768 61000 rservice " .. i .. "}")
+        local rhost = conky_parse("${tcp_portmon 32768 61000 rhost " .. i .. "}")
+
+        print("${goto 4}${color6}${voffset -1}${template4}├${color5}${template2}Out${template4} →${color2} ${template2}" .. rip .. "${alignr 4}" .. rservice)
+        print("${voffset -1}${goto 4}${template4}└ ${color3}${template3}" .. rhost)
+    end
+end
+
 -- Pre-hook: Background shading
 function conky_draw_pre()
     if conky_window == nil then return end
@@ -68,7 +101,7 @@ function conky_draw_pre()
 
     local in_count = tonumber(conky_parse("${tcp_portmon 1 32767 count}")) or 0
     local out_count = tonumber(conky_parse("${tcp_portmon 32768 61000 count}")) or 0
-    local total_pairs = math.max(in_count, out_count)
+    local total_pairs = math.min(in_count + out_count, 25) -- Limit total connections to 25
     local max_pairs = 25
     local draw_pairs = math.min(total_pairs, max_pairs)
 
