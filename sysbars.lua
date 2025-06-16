@@ -110,6 +110,17 @@ local function equalizer(cr, params)
     end
 end
 
+-- Helper function to draw stripes
+local function draw_stripes(cr, start_y, line_height, total_width, stripe_color)
+    for i = 0, 9 do
+        if i % 2 == 1 then
+            cairo_set_source_rgba(cr, stripe_color[1], stripe_color[2], stripe_color[3], stripe_color[4])
+            cairo_rectangle(cr, 13, start_y + (i * line_height), total_width, line_height)
+            cairo_fill(cr)
+        end
+    end
+end
+
 function conky_draw_pre()
     if conky_window == nil then return end
 
@@ -123,21 +134,9 @@ function conky_draw_pre()
     local total_width = 256
     local stripe_color = {0.15, 0.50, 1.00, 0.2}
 
-    for i = 0, 9 do
-        if i % 2 == 1 then
-            cairo_set_source_rgba(cr, stripe_color[1], stripe_color[2], stripe_color[3], stripe_color[4])
-            cairo_rectangle(cr, 13, ram_start_y + (i * line_height), total_width, line_height)
-            cairo_fill(cr)
-        end
-    end
-
-    for i = 0, 9 do
-        if i % 2 == 1 then
-            cairo_set_source_rgba(cr, stripe_color[1], stripe_color[2], stripe_color[3], stripe_color[4])
-            cairo_rectangle(cr, 13, cpu_start_y + (i * line_height), total_width, line_height)
-            cairo_fill(cr)
-        end
-    end
+    -- Use the helper function for both stripes
+    draw_stripes(cr, ram_start_y, line_height, total_width, stripe_color)
+    draw_stripes(cr, cpu_start_y, line_height, total_width, stripe_color)
 
     cairo_destroy(cr)
     cairo_surface_destroy(cs)
