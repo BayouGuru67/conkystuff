@@ -43,12 +43,9 @@ local function draw_block(cr, x2, y2, w, cos_angle, sin_angle, r, g, b, alpha, l
 end
 
 -- Cached network connection check (remains unchanged, already efficient)
-local function is_network_connected_cached()
-    if _G.cached_is_network_connected == nil then
-        local ip = conky_parse('${addr enp4s0}')
-        _G.cached_is_network_connected = (ip and ip ~= '' and ip ~= '0.0.0.0')
-    end
-    return _G.cached_is_network_connected
+local function is_network_connected()
+    local ip = conky_parse('${addr enp4s0}')
+    return (ip and ip ~= '' and ip ~= '0.0.0.0')
 end
 
 function conky_limit_connections(max_in, max_total)
@@ -99,7 +96,7 @@ end
 -- Pre-hook: Background shading
 function conky_draw_pre()
     if conky_window == nil then return end
-    if not is_network_connected_cached() then return end
+    if not is_network_connected() then return end
 
     local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable,
                  conky_window.visual, conky_window.width, conky_window.height)
@@ -107,7 +104,7 @@ function conky_draw_pre()
 
     -- Background stripe parameters
     local start_x = 13
-    local start_y = 268
+    local start_y = 266
     local pair_height = 30
     local total_width = 294
 
@@ -134,7 +131,7 @@ end
 -- Post-hook: Speed bars
 function conky_draw_post()
     if conky_window == nil then return end
-    if not is_network_connected_cached() then return end
+    if not is_network_connected() then return end
 
     local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable,
                  conky_window.visual, conky_window.width, conky_window.height)
