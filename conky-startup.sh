@@ -17,7 +17,7 @@ start_conky_and_wait() {
         if xdotool search --name "$window_title" >/dev/null 2>&1; then
             break
         fi
-        sleep 0.1
+        sleep 0.5
     done
 }
 
@@ -27,11 +27,17 @@ start_conky_and_wait "/home/bayouguru/.conky/l-conky-cpu.conf" "CPU-Conky"
 # Start Network Conky
 start_conky_and_wait "/home/bayouguru/.conky/rightconky.conf" "Net-Conky"
 
+# Start Top 10's Conky
+start_conky_and_wait "home/bayouguru/.conky/l-conky-tops.conf" "Tops-Conky"
+
 # Start System Info Conky
-start_conky_and_wait "/home/bayouguru/.conky/l-conky-sysinfo.conf" "SysInfo-Conky"
+# start_conky_and_wait "/home/bayouguru/.conky/l-conky-sysinfo.conf" "SysInfo-Conky"
 
 # Start Animated Fan Conky
 # start_conky_and_wait "/home/bayouguru/.conky/anifan.conf" "Fan-Conky"
+
+# Start Yamaha Conky
+# start_conky_and_wait "/home/bayouguru/.conky/yamaha/yamaconky.conf" "YamaConky"
 
 # Wait for background processes to finish (not strictly needed)
 wait
