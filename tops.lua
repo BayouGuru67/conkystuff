@@ -1,12 +1,19 @@
 require 'cairo'
 require 'cairo_xlib'
 
--- Helper function to draw stripes
-local function draw_stripes(cr, start_y, line_height, total_width, stripe_color)
-    for i = 0, 9 do
+-- === CONFIG ===
+local STRIPE_COLOR = {0.431, 0.133, 0.710, 0.3}
+local SECTIONS = {
+    {start_y = 32,  line_height = 16, total_width = 254, lines = 10},  -- RAM
+    {start_y = 207, line_height = 16, total_width = 254, lines = 10},  -- CPU
+}
+
+-- === LOCAL HELPERS ===
+local function draw_stripes(cr, section)
+    for i = 0, section.lines - 1 do
         if i % 2 == 1 then
-            cairo_set_source_rgba(cr, stripe_color[1], stripe_color[2], stripe_color[3], stripe_color[4])
-            cairo_rectangle(cr, 12, start_y + (i * line_height), total_width, line_height)
+            cairo_set_source_rgba(cr, table.unpack(STRIPE_COLOR))
+            cairo_rectangle(cr, 12, section.start_y + (i * section.line_height), section.total_width, section.line_height)
             cairo_fill(cr)
         end
     end
@@ -14,20 +21,12 @@ end
 
 function conky_draw_pre()
     if conky_window == nil then return end
-
     local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable,
-                 conky_window.visual, conky_window.width, conky_window.height)
+        conky_window.visual, conky_window.width, conky_window.height)
     local cr = cairo_create(cs)
-
-    local ram_start_y = 32
-    local cpu_start_y = 207
-    local line_height = 16
-    local total_width = 254
-    local stripe_color = {0.431, 0.133, 0.710, 0.3}
-
-    draw_stripes(cr, ram_start_y, line_height, total_width, stripe_color)
-    draw_stripes(cr, cpu_start_y, line_height, total_width, stripe_color)
-
+    for _, section in ipairs(SECTIONS) do
+        draw_stripes(cr, section)
+    end
     cairo_destroy(cr)
     cairo_surface_destroy(cs)
 end
