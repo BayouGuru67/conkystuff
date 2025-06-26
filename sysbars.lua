@@ -126,25 +126,25 @@ function conky_draw_post()
 
     local equalizer_params = {
         {
-            xb = 49, yb = 182, name = 'memperc', arg = '', max = 100, nb_blocks = 43, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 48, yb = 180, name = 'memperc', arg = '', max = 100, nb_blocks = 43, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 4, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 306, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 43, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 48, yb = 304, name = 'fs_used_perc', arg = '/', max = 100, nb_blocks = 43, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 4, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 370, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 43,
+            xb = 48, yb = 368, name = 'fs_used_perc', arg = '/home/bayouguru/N-1Tb/', max = 100, nb_blocks = 43,
             cap = CAIRO_LINE_CAP_SQUARE, w = 8, h = 4, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
         },
         {
-            xb = 49, yb = 434, name = 'swapperc', arg = '', max = 100, nb_blocks = 43, cap = CAIRO_LINE_CAP_SQUARE,
+            xb = 48, yb = 432, name = 'swapperc', arg = '', max = 100, nb_blocks = 43, cap = CAIRO_LINE_CAP_SQUARE,
             w = 8, h = 4, space = 1, bgc = 0x404040, bga = 0.7, fgc = 0x00ff00, fga = 1,
             yelc = 0xffff00, yela = 1, alc = 0xff0000, ala = 1,
             alarm = 75, high_alarm = 90, led_effect = true, led_alpha = 0.9, rotation = 90
@@ -159,13 +159,13 @@ function conky_draw_post()
     }
 
     local led_positions = {
-        {x = 78, y = 12, state = temp1, thresholds = {green = 140, red = 160}},
-        {x = 182, y = 12, state = temp2, thresholds = {green = 120, red = 148}},
-        {x = 142, y = 44, state = "CapsLock", thresholds = led_thresholds},
-        {x = 253, y = 44, state = "NumLock", thresholds = led_thresholds},
-        {x = 26, y = 340, state = temp3, thresholds = {green = 120, red = 140}},
-        {x = 26, y = 404, state = temp4, thresholds = {green = 120, red = 140}},
-        {x = 26, y = 437, state = swapperc, thresholds = led_thresholds},
+        {x = 78, y = 10, state = temp1, thresholds = {green = 140, red = 160}},
+        {x = 182, y = 10, state = temp2, thresholds = {green = 120, red = 148}},
+        {x = 142, y = 42, state = "CapsLock", thresholds = led_thresholds},
+        {x = 253, y = 42, state = "NumLock", thresholds = led_thresholds},
+        {x = 26, y = 338, state = temp3, thresholds = {green = 120, red = 140}},
+        {x = 26, y = 402, state = temp4, thresholds = {green = 120, red = 140}},
+        {x = 26, y = 435, state = swapperc, thresholds = led_thresholds},
     }
 
     for _, params in ipairs(equalizer_params) do
