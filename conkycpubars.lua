@@ -149,9 +149,9 @@ function conky_conkycpubars_draw_pre()
                                          conky_window.visual, conky_window.width, conky_window.height)
     local cr = cairo_create(cs)
 
-    cairo_set_source_rgba(cr, 0.15, 0.50, 1.00, 0.2)
-    cairo_rectangle(cr, 3, 52, 262, 28)
-    cairo_rectangle(cr, 3, 108, 262, 28)
+    cairo_set_source_rgba(cr, 0.431, 0.133, 0.710, 0.3)
+    cairo_rectangle(cr, 4, 50, 260, 28)
+    cairo_rectangle(cr, 4, 106, 260, 28)
     cairo_fill(cr)
 
     cairo_destroy(cr)

@@ -85,9 +85,9 @@ function conky_limit_connections(max_in, max_total)
         local rhost = conky_parse("${tcp_portmon 32768 61000 rhost " .. i .. "}")
 
         out = out
-            .. "${goto 4}${color6}${voffset -1}${template4}├${color5}${template2}Out${template4} →${color2} ${template2}"
+            .. "${color6}${voffset -1}${template4}├${color5}${template2}Out${template4} →${color2} ${template2}"
             .. rip .. "${alignr 4}" .. rservice .. "\n"
-            .. "${voffset -1}${goto 4}${template4}└ ${color3}${template3}" .. rhost .. "\n"
+            .. "${voffset -1}${template4}└ ${color3}${template3}" .. rhost .. "\n"
     end
 
     return out
@@ -103,10 +103,10 @@ function conky_draw_pre()
     local cr = cairo_create(cs)
 
     -- Background stripe parameters
-    local start_x = 13
+    local start_x = 10
     local start_y = 266
     local pair_height = 30
-    local total_width = 294
+    local total_width = 290
 
     local in_count = tonumber(conky_parse("${tcp_portmon 1 32767 count}")) or 0
     local out_count = tonumber(conky_parse("${tcp_portmon 32768 61000 count}")) or 0
@@ -114,7 +114,7 @@ function conky_draw_pre()
     local max_pairs = 25
     local draw_pairs = math.min(total_pairs, max_pairs)
 
-    cairo_set_source_rgba(cr, 0.15, 0.50, 1.00, 0.2)
+    cairo_set_source_rgba(cr, 0.431, 0.133, 0.710, 0.3)
 
     for i = 0, draw_pairs - 1 do
         if i % 2 == 1 then

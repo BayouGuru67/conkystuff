@@ -28,15 +28,15 @@ start_conky_and_wait "/home/bayouguru/.conky/l-conky-cpu.conf" "CPU-Conky"
 start_conky_and_wait "/home/bayouguru/.conky/rightconky.conf" "Net-Conky"
 
 # Start Top 10's Conky
-start_conky_and_wait "home/bayouguru/.conky/l-conky-tops.conf" "Tops-Conky"
+start_conky_and_wait "/home/bayouguru/.conky/l-conky-tops.conf" "Tops-Conky"
 
 # Start System Info Conky
-start_conky_and_wait "/home/bayouguru/.conky/l-conky-sysinfo.conf" "SysInfo-Conky"
+# start_conky_and_wait "/home/bayouguru/.conky/l-conky-sysinfo.conf" "SysInfo-Conky"
 
-# Start Animated Fan Conky (disabled)
+# Start Animated Fan Conky
 # start_conky_and_wait "/home/bayouguru/.conky/anifan.conf" "Fan-Conky"
 
-# Start Yamaha Conky (disabled)
+# Start Yamaha Conky
 # start_conky_and_wait "/home/bayouguru/.conky/yamaha/yamaconky.conf" "YamaConky"
 
 # Wait for background processes to finish (not strictly needed)
