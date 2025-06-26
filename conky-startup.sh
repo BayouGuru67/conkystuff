@@ -31,7 +31,7 @@ start_conky_and_wait "/home/bayouguru/.conky/rightconky.conf" "Net-Conky"
 start_conky_and_wait "/home/bayouguru/.conky/l-conky-tops.conf" "Tops-Conky"
 
 # Start System Info Conky
-# start_conky_and_wait "/home/bayouguru/.conky/l-conky-sysinfo.conf" "SysInfo-Conky"
+start_conky_and_wait "/home/bayouguru/.conky/l-conky-sysinfo.conf" "SysInfo-Conky"
 
 # Start Animated Fan Conky
 # start_conky_and_wait "/home/bayouguru/.conky/anifan.conf" "Fan-Conky"
