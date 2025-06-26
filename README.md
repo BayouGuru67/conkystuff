@@ -1,6 +1,6 @@
 # BayouGuru's conky repo!
 
-This repository contains all of the currently active conkys on BayouGuru's main computer system.  These conkys are the result of an evolution over quite some time now as my system has grown/evolved and my conky, AI and lua coding skills have improved.  Screenshots are availble for each conky and the desktop as a whole in the images directory.
+This repository contains all of the currently active (& inactive) conkys on BayouGuru's main computer system.  These conkys are the result of an evolution over quite some time now as my system has grown/evolved and my conky, AI and lua coding skills have improved.  Screenshots are availble for each conky and the desktop as a whole in the images directory.
 
 These conkys are designed to be readable from 10'-12' away from a 55" 1080p display.  Using them in any other setting will likely require significant editing of the configurations in order to maintain a neat appearance.  I'll admit to a little bit of curiosity to see what happens when I finally get to upgrade to a higher resolution display that will do more than 30Hz @ 4k.
 
