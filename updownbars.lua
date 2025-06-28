@@ -1,14 +1,14 @@
 require 'cairo'
 require 'cairo_xlib'
 
--- === CONFIGURATION TABLES ===
+-- CONFIG
 local COLORS = {
-    bg      = {0.251, 0.251, 0.251, 0.8},      -- 0x404040, 0.8
-    green   = {0, 1, 0, 1},                    -- 0x00ff00, 1
-    yellow  = {1, 1, 0, 1},                    -- 0xffff00, 1
-    red     = {1, 0, 0, 1},                    -- 0xff0000, 1
-    white   = {1, 1, 1, 1},                    -- 0xffffff, 1
-    bar_bg  = {0.431, 0.133, 0.710, 0.3},      -- background stripes
+    bg      = {0.251, 0.251, 0.251, 0.8},
+    green   = {0, 1, 0, 1},
+    yellow  = {1, 1, 0, 1},
+    red     = {1, 0, 0, 1},
+    white   = {1, 1, 1, 1},
+    bar_bg  = {0.431, 0.133, 0.710, 0.3},
 }
 local BAR_CONFIG = {
     {
@@ -26,7 +26,7 @@ local BAR_CONFIG = {
 }
 local BG_STRIPE = {start_x = 10, start_y = 266, pair_height = 30, total_width = 290, max_pairs = 25}
 
--- === PRECOMPUTED BAR PARAMS ===
+-- Precompute
 for _, params in ipairs(BAR_CONFIG) do
     params._log_max = math.log(params.max + 1)
     params._angle = (params.rotation or 0) * math.pi / 180
@@ -34,15 +34,13 @@ for _, params in ipairs(BAR_CONFIG) do
     params._sin_angle = math.sin(params._angle)
 end
 
--- === LOCAL HELPERS ===
-
--- Returns true if the network interface is up
+-- NETWORK CONNECTED
 local function is_network_connected()
     local ip = conky_parse('${addr enp4s0}')
     return (ip and ip ~= '' and ip ~= '0.0.0.0')
 end
 
--- Returns 'in' and 'out' connection counts, capped
+-- CONNECTION COUNTS
 local function get_connection_counts(max_in, max_total)
     local in_count = tonumber(conky_parse("${tcp_portmon 1 32767 count}")) or 0
     local out_count = tonumber(conky_parse("${tcp_portmon 32768 61000 count}")) or 0
@@ -51,28 +49,22 @@ local function get_connection_counts(max_in, max_total)
     return in_count, out_to_show
 end
 
--- Draw a block with 3D and LED effect, reusing pattern for runs of same color
-local function draw_block(cr, x2, y2, w, cos_angle, sin_angle, color, led_effect, led_alpha, pattern_cache)
+-- DRAW BLOCK: NO CACHE
+local function draw_block(cr, x2, y2, w, cos_angle, sin_angle, color, led_effect, led_alpha)
     local r, g, b, a = table.unpack(color)
     local xx0, xx1 = x2, x2 + w * cos_angle
     local yy0, yy1 = y2, y2 + w * sin_angle
 
-    -- Pattern key by color/alpha and block size
-    local pat_key = string.format("%.3f,%.3f,%.3f,%.3f,%.1f", r, g, b, a, w)
-    local pat = pattern_cache[pat_key]
-    if not pat then
-        pat = cairo_pattern_create_linear(xx0, yy0, xx0, yy1)
-        cairo_pattern_add_color_stop_rgba(pat, 0, r, g, b, a * 0.4)
-        cairo_pattern_add_color_stop_rgba(pat, 0.5, r, g, b, a)
-        cairo_pattern_add_color_stop_rgba(pat, 1, r, g, b, a * 0.4)
-        pattern_cache[pat_key] = pat
-    end
+    local pat = cairo_pattern_create_linear(xx0, yy0, xx0, yy1)
+    cairo_pattern_add_color_stop_rgba(pat, 0, r, g, b, a * 0.4)
+    cairo_pattern_add_color_stop_rgba(pat, 0.5, r, g, b, a)
+    cairo_pattern_add_color_stop_rgba(pat, 1, r, g, b, a * 0.4)
     cairo_set_source(cr, pat)
     cairo_move_to(cr, xx0, yy0)
     cairo_line_to(cr, xx1, yy1)
     cairo_stroke(cr)
+    cairo_pattern_destroy(pat)
 
-    -- LED overlay (pattern not reused due to alpha gradient)
     if led_effect then
         local xc, yc = (xx0 + xx1)/2, (yy0 + yy1)/2
         local led_pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w/2)
@@ -84,7 +76,7 @@ local function draw_block(cr, x2, y2, w, cos_angle, sin_angle, color, led_effect
     end
 end
 
--- Draw bar stripes in the background for pairs of connections
+-- BACKGROUND STRIPES
 local function draw_background_stripes(cr, count)
     cairo_set_source_rgba(cr, table.unpack(COLORS.bar_bg))
     for i = 0, count - 1 do
@@ -96,7 +88,7 @@ local function draw_background_stripes(cr, count)
     end
 end
 
--- === CONKY HOOK FUNCTIONS ===
+-- CONKY HOOKS
 
 function conky_limit_connections(max_in, max_total)
     max_in = tonumber(max_in) or 0
@@ -147,7 +139,6 @@ function conky_draw_post()
                  conky_window.visual, conky_window.width, conky_window.height)
     local cr = cairo_create(cs)
     for _, params in ipairs(BAR_CONFIG) do
-        -- Get current value
         local value = tonumber(conky_parse(string.format('${%s %s}', params.name, params.arg))) or 0
         local log_value = (value > 0) and math.log(value + 1) or 0
         local pct = 100 * log_value / params._log_max
@@ -157,12 +148,9 @@ function conky_draw_post()
         cairo_set_line_width(cr, params.h)
         cairo_set_line_cap(cr, params.cap)
 
-        local pattern_cache = {}  -- Keyed by color/alpha/w for block run reuse
-
-        local last_color = nil
-        local color = nil
         for pt = 1, params.nb_blocks do
             local blockStartPercentage = (pt - 1) * pcb
+            local color
             if pct >= blockStartPercentage then
                 if blockStartPercentage < params.warning then
                     color = COLORS.green
@@ -179,12 +167,7 @@ function conky_draw_post()
             local x2 = params.xb + radius0 * params._sin_angle
             local y2 = params.yb - radius0 * params._cos_angle
             draw_block(cr, x2, y2, params.w, params._cos_angle, params._sin_angle, color,
-                       params.led_effect, params.led_alpha, pattern_cache)
-        end
-
-        -- Clean up patterns (to avoid memory leaks)
-        for _, pat in pairs(pattern_cache) do
-            cairo_pattern_destroy(pat)
+                       params.led_effect, params.led_alpha)
         end
     end
     cairo_destroy(cr)
