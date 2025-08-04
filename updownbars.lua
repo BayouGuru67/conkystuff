@@ -88,31 +88,69 @@ local function draw_background_stripes(cr, count)
     end
 end
 
+-- Connection condensation logic:
+local function collect_connections(start_port, end_port, max_count)
+    local ip_table = {}
+    local order = {}
+    for i = 0, max_count - 1 do
+        local rip = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rip " .. i .. "}")
+        local rservice = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rservice " .. i .. "}")
+        local rhost = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rhost " .. i .. "}")
+        if rip and rip ~= "" then
+            if not ip_table[rip] then
+                ip_table[rip] = {count = 1, service = rservice, host = rhost}
+                table.insert(order, rip)
+            else
+                ip_table[rip].count = ip_table[rip].count + 1
+                -- Optionally update service/host if desired, here we keep last seen
+                ip_table[rip].service = rservice
+                ip_table[rip].host = rhost
+            end
+        end
+    end
+    return ip_table, order
+end
+
 -- CONKY HOOKS
 
 function conky_limit_connections(max_in, max_total)
     max_in = tonumber(max_in) or 0
     max_total = tonumber(max_total) or 0
+
     local in_count, out_to_show = get_connection_counts(max_in, max_total)
+
+    local in_table, in_order = collect_connections(1, 32768, in_count)
+    local out_table, out_order = collect_connections(32768, 61000, out_to_show)
+
     local out = ""
-    for i = 0, in_count - 1 do
-        local rip = conky_parse("${tcp_portmon 1 32768 rip " .. i .. "}")
-        local rservice = conky_parse("${tcp_portmon 1 32768 rservice " .. i .. "}")
-        local rhost = conky_parse("${tcp_portmon 1 32768 rhost " .. i .. "}")
+    local entries = 0
+
+    -- Inbound, keep order
+    for _, rip in ipairs(in_order) do
+        if entries >= max_total then break end
+        local info = in_table[rip]
+        local display_ip = info.count > 1 and (rip .. " (" .. info.count .. ")") or rip
         out = out
             .. "${goto 4}${color6}${voffset -1}${template4}├${color yellow}${template2}In${template4} ←${color2} ${template2}"
-            .. rip .. "${alignr 4}" .. rservice .. "\n"
-            .. "${voffset -1}${goto 4}${template4}└ ${color3}${template3}" .. rhost .. "\n"
+            .. display_ip .. "${alignr 4}" .. info.service .. "\n"
+            .. "${voffset -1}${goto 4}${template4}└ ${color3}${template3}" .. info.host .. "\n"
+        entries = entries + 1
+        if entries >= max_total then break end
     end
-    for i = 0, out_to_show - 1 do
-        local rip = conky_parse("${tcp_portmon 32768 61000 rip " .. i .. "}")
-        local rservice = conky_parse("${tcp_portmon 32768 61000 rservice " .. i .. "}")
-        local rhost = conky_parse("${tcp_portmon 32768 61000 rhost " .. i .. "}")
+
+    -- Outbound, keep order
+    for _, rip in ipairs(out_order) do
+        if entries >= max_total then break end
+        local info = out_table[rip]
+        local display_ip = info.count > 1 and (rip .. " (" .. info.count .. ")") or rip
         out = out
             .. "${color6}${voffset -1}${template4}├${color5}${template2}Out${template4} →${color2} ${template2}"
-            .. rip .. "${alignr 4}" .. rservice .. "\n"
-            .. "${voffset -1}${template4}└ ${color3}${template3}" .. rhost .. "\n"
+            .. display_ip .. "${alignr 4}" .. info.service .. "\n"
+            .. "${voffset -1}${template4}└ ${color3}${template3}" .. info.host .. "\n"
+        entries = entries + 1
+        if entries >= max_total then break end
     end
+
     return out
 end
 
