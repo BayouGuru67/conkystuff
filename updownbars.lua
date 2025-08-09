@@ -12,13 +12,13 @@ local COLORS = {
 }
 local BAR_CONFIG = {
     {
-        xb = 60, yb = 222, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 48,
+        xb = 60, yb = 220, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 48,
         cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 4, space = 1,
         warning = 75, alarm = 90,
         led_effect = true, led_alpha = 0.8, rotation = 90
     },
     {
-        xb = 60, yb = 240, name = 'downspeedf', arg = 'enp4s0', max = 100000, nb_blocks = 48,
+        xb = 60, yb = 238, name = 'downspeedf', arg = 'enp4s0', max = 100000, nb_blocks = 48,
         cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 4, space = 1,
         warning = 75, alarm = 90,
         led_effect = true, led_alpha = 0.8, rotation = 90
@@ -27,7 +27,7 @@ local BAR_CONFIG = {
 local BG_STRIPE = {start_x = 10, start_y = 266, pair_height = 30, total_width = 290, max_pairs = 25}
 
 -- Set your preferred connection limits here:
-local MAX_IN = 10      -- maximum inbound connections shown
+local MAX_IN = 10      -- maximum inbound connections shown (used if you want per-direction limits)
 local MAX_TOTAL = 25   -- maximum total connections shown
 
 -- Precompute
@@ -42,15 +42,6 @@ end
 local function is_network_connected()
     local ip = conky_parse('${addr enp4s0}')
     return (ip and ip ~= '' and ip ~= '0.0.0.0')
-end
-
--- CONNECTION COUNTS
-local function get_connection_counts(max_in, max_total)
-    local in_count = tonumber(conky_parse("${tcp_portmon 1 32767 count}")) or 0
-    local out_count = tonumber(conky_parse("${tcp_portmon 32768 61000 count}")) or 0
-    in_count = math.min(in_count, max_in)
-    local out_to_show = math.min(out_count, max_total - in_count)
-    return in_count, out_to_show
 end
 
 -- DRAW BLOCK: NO CACHE
@@ -92,23 +83,22 @@ local function draw_background_stripes(cr, visible_entries)
     end
 end
 
--- Connection condensation logic:
-local function collect_connections(start_port, end_port, max_count)
+-- Connection condensation logic: always scan ALL connections for the range, fill up to max_display unique
+local function collect_connections(start_port, end_port, max_display)
+    local total_conns = tonumber(conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " count}")) or 0
     local ip_table = {}
     local order = {}
-    for i = 0, max_count - 1 do
+    for i = 0, total_conns - 1 do
+        if #order >= max_display then break end
         local rip = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rip " .. i .. "}")
+        if not rip or rip == "" then break end
         local rservice = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rservice " .. i .. "}")
         local rhost = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rhost " .. i .. "}")
-        if rip and rip ~= "" then
-            if not ip_table[rip] then
-                ip_table[rip] = {count = 1, service = rservice, host = rhost}
-                table.insert(order, rip)
-            else
-                ip_table[rip].count = ip_table[rip].count + 1
-                ip_table[rip].service = rservice
-                ip_table[rip].host = rhost
-            end
+        if not ip_table[rip] then
+            ip_table[rip] = {count = 1, service = rservice, host = rhost}
+            table.insert(order, rip)
+        else
+            ip_table[rip].count = ip_table[rip].count + 1
         end
     end
     return ip_table, order
@@ -116,9 +106,9 @@ end
 
 -- Count condensed connection entries
 local function get_visible_connection_entries(max_in, max_total)
-    local in_count, out_to_show = get_connection_counts(max_in, max_total)
-    local in_table, in_order = collect_connections(1, 32768, in_count)
-    local out_table, out_order = collect_connections(32768, 61000, out_to_show)
+    -- Always try to fill up to max_total, scanning all connections in each direction
+    local in_table, in_order = collect_connections(1, 32767, max_total)
+    local out_table, out_order = collect_connections(32768, 61000, max_total)
 
     local entries = 0
     for _, _ in ipairs(in_order) do
@@ -140,9 +130,9 @@ function conky_limit_connections(max_in, max_total)
     max_in = tonumber(max_in) or 0
     max_total = tonumber(max_total) or 0
 
-    local in_count, out_to_show = get_connection_counts(max_in, max_total)
-    local in_table, in_order = collect_connections(1, 32768, in_count)
-    local out_table, out_order = collect_connections(32768, 61000, out_to_show)
+    -- Always try to fill up to max_total, scanning all connections in each direction
+    local in_table, in_order = collect_connections(1, 32767, max_total)
+    local out_table, out_order = collect_connections(32768, 61000, max_total)
 
     local out = ""
     local entries = 0
