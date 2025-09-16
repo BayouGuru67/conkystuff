@@ -38,6 +38,29 @@ for _, params in ipairs(BAR_CONFIG) do
     params._sin_angle = math.sin(params._angle)
 end
 
+-- Per-update connection table cache
+local conn_cache = {
+    last_update = -1,
+    in_table = nil,
+    in_order = nil,
+    out_table = nil,
+    out_order = nil
+}
+
+local function get_update_number()
+    return tonumber(conky_parse("${updates}")) or 0
+end
+
+local function get_cached_connections(max_in, max_total)
+    local upd = get_update_number()
+    if conn_cache.last_update ~= upd then
+        conn_cache.in_table, conn_cache.in_order = collect_connections(1, 32767, max_total)
+        conn_cache.out_table, conn_cache.out_order = collect_connections(32768, 61000, max_total)
+        conn_cache.last_update = upd
+    end
+    return conn_cache.in_table, conn_cache.in_order, conn_cache.out_table, conn_cache.out_order
+end
+
 -- NETWORK CONNECTED
 local function is_network_connected()
     local ip = conky_parse('${addr enp4s0}')
@@ -84,7 +107,7 @@ local function draw_background_stripes(cr, visible_entries)
 end
 
 -- Connection condensation logic: always scan ALL connections for the range, fill up to max_display unique
-local function collect_connections(start_port, end_port, max_display)
+function collect_connections(start_port, end_port, max_display)
     local total_conns = tonumber(conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " count}")) or 0
     local ip_table = {}
     local order = {}
@@ -92,9 +115,9 @@ local function collect_connections(start_port, end_port, max_display)
         if #order >= max_display then break end
         local rip = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rip " .. i .. "}")
         if not rip or rip == "" then break end
-        local rservice = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rservice " .. i .. "}")
-        local rhost = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rhost " .. i .. "}")
         if not ip_table[rip] then
+            local rservice = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rservice " .. i .. "}")
+            local rhost = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rhost " .. i .. "}")
             ip_table[rip] = {count = 1, service = rservice, host = rhost}
             table.insert(order, rip)
         else
@@ -106,9 +129,7 @@ end
 
 -- Count condensed connection entries
 local function get_visible_connection_entries(max_in, max_total)
-    -- Always try to fill up to max_total, scanning all connections in each direction
-    local in_table, in_order = collect_connections(1, 32767, max_total)
-    local out_table, out_order = collect_connections(32768, 61000, max_total)
+    local in_table, in_order, out_table, out_order = get_cached_connections(max_in, max_total)
 
     local entries = 0
     for _, _ in ipairs(in_order) do
@@ -130,9 +151,7 @@ function conky_limit_connections(max_in, max_total)
     max_in = tonumber(max_in) or 0
     max_total = tonumber(max_total) or 0
 
-    -- Always try to fill up to max_total, scanning all connections in each direction
-    local in_table, in_order = collect_connections(1, 32767, max_total)
-    local out_table, out_order = collect_connections(32768, 61000, max_total)
+    local in_table, in_order, out_table, out_order = get_cached_connections(max_in, max_total)
 
     local out = ""
     local entries = 0
