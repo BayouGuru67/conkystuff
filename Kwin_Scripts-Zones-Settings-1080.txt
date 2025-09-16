@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Center-Filled",
+        "padding": 0,
+        "zones": [
+            {
+                "x": 13.80,
+                "y": 0,
+                "height": 100,
+                "width": 70.4
+            }
+        ]
+    },
+    {
+        "name": "Center-Bottom",
+        "padding": 0,
+        "zones": [
+            {
+                "x": 13.75,
+                "y": 26,
+                "height": 74,
+                "width": 70.5
+            }
+        ]
+    },
+    {
+        "name": "Center-Top",
+        "padding": 0,
+        "zones": [
+            {
+                "x": 13.75,
+                "y": 0,
+                "height": 74,
+                "width": 70.5
+            }
+        ]
+    },
+    {
+        "name": "Center Grid 50/50",
+        "padding": 0,
+        "zones": [
+            {
+                "x": 13.75,
+                "y": 0,
+                "height": 50,
+                "width": 70.5
+            },
+            {
+                "x": 13.75,
+                "y": 50,
+                "height": 50,
+                "width": 70.5
+            }
+        ]
+    },
+    {
+        "name": "Center Quad Grid",
+        "zones": [
+            {
+                "x": 13.75,
+                "y": 0,
+                "height": 50,
+                "width": 35.25
+            },
+            {
+                "x": 13.75,
+                "y": 50,
+                "height": 50,
+                "width": 35.25
+            },
+            {
+                "x": 50,
+                "y": 50,
+                "height": 50,
+                "width": 34
+            },
+            {
+                "x": 50,
+                "y": 0,
+                "height": 50,
+                "width": 34
+            }
+        ]
+    },
+    {
+        "name": "Double HD",
+        "zones": [
+            {
+                "x": 0,
+                "y": 44,
+                "height": 56,
+                "width": 50
+            },
+            {
+                "x": 50,
+                "y": 44,
+                "height": 56,
+                "width": 50
+            }
+        ]
+    }
+]
