@@ -94,18 +94,6 @@ local function draw_block(cr, x2, y2, w, cos_angle, sin_angle, color, led_effect
     end
 end
 
--- BACKGROUND STRIPES
-local function draw_background_stripes(cr, visible_entries)
-    cairo_set_source_rgba(cr, table.unpack(COLORS.bar_bg))
-    for i = 0, visible_entries - 1 do
-        if i % 2 == 1 then
-            local y_pos = BG_STRIPE.start_y + (i * BG_STRIPE.pair_height)
-            cairo_rectangle(cr, BG_STRIPE.start_x, y_pos, BG_STRIPE.total_width, BG_STRIPE.pair_height)
-            cairo_fill(cr)
-        end
-    end
-end
-
 -- Connection condensation logic: always scan ALL connections for the range, fill up to max_display unique
 function collect_connections(start_port, end_port, max_display)
     local total_conns = tonumber(conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " count}")) or 0
@@ -127,22 +115,36 @@ function collect_connections(start_port, end_port, max_display)
     return ip_table, order
 end
 
--- Count condensed connection entries
-local function get_visible_connection_entries(max_in, max_total)
+-- New: Get the displayed connections as a single ordered list (for stripes and display)
+local function get_displayed_connections(max_in, max_total)
     local in_table, in_order, out_table, out_order = get_cached_connections(max_in, max_total)
+    local entries = {}
+    local total = 0
 
-    local entries = 0
-    for _, _ in ipairs(in_order) do
-        if entries >= max_total then break end
-        entries = entries + 1
-        if entries >= max_total then break end
+    for _, rip in ipairs(in_order) do
+        if total >= max_total then break end
+        table.insert(entries, {direction="in", rip=rip, info=in_table[rip]})
+        total = total + 1
     end
-    for _, _ in ipairs(out_order) do
-        if entries >= max_total then break end
-        entries = entries + 1
-        if entries >= max_total then break end
+    for _, rip in ipairs(out_order) do
+        if total >= max_total then break end
+        table.insert(entries, {direction="out", rip=rip, info=out_table[rip]})
+        total = total + 1
     end
+
     return entries
+end
+
+-- BACKGROUND STRIPES: Shade every other displayed connection row, not just visible slots
+local function draw_background_stripes(cr, display_entries)
+    cairo_set_source_rgba(cr, table.unpack(COLORS.bar_bg))
+    for idx, _ in ipairs(display_entries) do
+        if idx % 2 == 0 then -- shade every other row; Lua arrays are 1-based
+            local y_pos = BG_STRIPE.start_y + ((idx-1) * BG_STRIPE.pair_height)
+            cairo_rectangle(cr, BG_STRIPE.start_x, y_pos, BG_STRIPE.total_width, BG_STRIPE.pair_height)
+            cairo_fill(cr)
+        end
+    end
 end
 
 -- CONKY HOOKS
@@ -151,35 +153,23 @@ function conky_limit_connections(max_in, max_total)
     max_in = tonumber(max_in) or 0
     max_total = tonumber(max_total) or 0
 
-    local in_table, in_order, out_table, out_order = get_cached_connections(max_in, max_total)
-
+    local display_entries = get_displayed_connections(max_in, max_total)
     local out = ""
-    local entries = 0
 
-    -- Inbound, keep order
-    for _, rip in ipairs(in_order) do
-        if entries >= max_total then break end
-        local info = in_table[rip]
-        local display_ip = info.count > 1 and (rip .. " (" .. info.count .. ")") or rip
-        out = out
-            .. "${goto 4}${color6}${voffset -1}${template4}├${color yellow}${template2}In${template4} ←${color2} ${template2}"
-            .. display_ip .. "${alignr 4}" .. info.service .. "\n"
-            .. "${voffset -1}${goto 4}${template4}└ ${color3}${template3}" .. info.host .. "\n"
-        entries = entries + 1
-        if entries >= max_total then break end
-    end
-
-    -- Outbound, keep order
-    for _, rip in ipairs(out_order) do
-        if entries >= max_total then break end
-        local info = out_table[rip]
-        local display_ip = info.count > 1 and (rip .. " (" .. info.count .. ")") or rip
-        out = out
-            .. "${color6}${voffset -1}${template4}├${color5}${template2}Out${template4} →${color2} ${template2}"
-            .. display_ip .. "${alignr 4}" .. info.service .. "\n"
-            .. "${voffset -1}${template4}└ ${color3}${template3}" .. info.host .. "\n"
-        entries = entries + 1
-        if entries >= max_total then break end
+    for _, entry in ipairs(display_entries) do
+        local info = entry.info
+        local display_ip = info.count > 1 and (entry.rip .. " (" .. info.count .. ")") or entry.rip
+        if entry.direction == "in" then
+            out = out
+                .. "${goto 4}${color6}${voffset -1}${template4}├${color yellow}${template2}In${template4} ←${color2} ${template2}"
+                .. display_ip .. "${alignr 4}" .. info.service .. "\n"
+                .. "${voffset -1}${goto 4}${template4}└ ${color3}${template3}" .. info.host .. "\n"
+        else
+            out = out
+                .. "${color6}${voffset -1}${template4}├${color5}${template2}Out${template4} →${color2} ${template2}"
+                .. display_ip .. "${alignr 4}" .. info.service .. "\n"
+                .. "${voffset -1}${template4}└ ${color3}${template3}" .. info.host .. "\n"
+        end
     end
 
     return out
@@ -192,9 +182,8 @@ function conky_draw_pre()
                  conky_window.visual, conky_window.width, conky_window.height)
     local cr = cairo_create(cs)
 
-    -- Use the same condensed connection entry count for stripes as for display
-    local visible_entries = get_visible_connection_entries(MAX_IN, MAX_TOTAL)
-    draw_background_stripes(cr, visible_entries)
+    local display_entries = get_displayed_connections(MAX_IN, MAX_TOTAL)
+    draw_background_stripes(cr, display_entries)
 
     cairo_destroy(cr)
     cairo_surface_destroy(cs)
