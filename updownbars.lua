@@ -147,16 +147,17 @@ local function draw_background_stripes(cr, display_entries)
     end
 end
 
--- CONKY HOOKS
+-- Global for synced display entries
+last_display_entries = nil
 
 function conky_limit_connections(max_in, max_total)
     max_in = tonumber(max_in) or 0
     max_total = tonumber(max_total) or 0
 
-    local display_entries = get_displayed_connections(max_in, max_total)
-    local out = ""
+    last_display_entries = get_displayed_connections(max_in, max_total)  -- Sync for this update!
 
-    for _, entry in ipairs(display_entries) do
+    local out = ""
+    for _, entry in ipairs(last_display_entries) do
         local info = entry.info
         local display_ip = info.count > 1 and (entry.rip .. " (" .. info.count .. ")") or entry.rip
         if entry.direction == "in" then
@@ -178,12 +179,12 @@ end
 function conky_draw_pre()
     if conky_window == nil then return end
     if not is_network_connected() then return end
+    if not last_display_entries then return end  -- Use last set from conky_limit_connections
     local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable,
                  conky_window.visual, conky_window.width, conky_window.height)
     local cr = cairo_create(cs)
 
-    local display_entries = get_displayed_connections(MAX_IN, MAX_TOTAL)
-    draw_background_stripes(cr, display_entries)
+    draw_background_stripes(cr, last_display_entries)
 
     cairo_destroy(cr)
     cairo_surface_destroy(cs)
@@ -192,6 +193,7 @@ end
 function conky_draw_post()
     if conky_window == nil then return end
     if not is_network_connected() then return end
+    -- You can use last_display_entries here for consistency, but bars are not affected by the sync issue
     local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable,
                  conky_window.visual, conky_window.width, conky_window.height)
     local cr = cairo_create(cs)
