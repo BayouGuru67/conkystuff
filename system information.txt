@@ -1,0 +1,68 @@
+gigabyte_wmi-virtual-0
+Adapter: Virtual device
+temp1:        +77.0°F
+temp2:       +114.8°F
+temp3:       +100.4°F
+temp4:        +87.8°F
+temp5:        +98.6°F
+
+nvme-pci-0200
+Adapter: PCI adapter
+Composite:    +89.3°F  (low  = -40.3°F, high = +193.7°F)
+                       (crit = +200.9°F)
+Sensor 1:    +110.9°F  (low  = -459.7°F, high = +117503.3°F)
+Sensor 2:     +91.1°F  (low  = -459.7°F, high = +117503.3°F)
+
+acpitz-acpi-0
+Adapter: ACPI interface
+temp1:        +62.2°F
+
+amdgpu-pci-0100
+Adapter: PCI adapter
+vddgfx:      750.00 mV
+fan1:         776 RPM  (min =    0 RPM, max = 3800 RPM)
+edge:         +82.4°F  (crit = +201.2°F, hyst = -459.7°F)
+PPT:           7.23 W  (cap = 147.00 W)
+pwm1:             36%  MANUAL CONTROL
+sclk:         300 MHz
+mclk:         300 MHz
+
+k10temp-pci-00c3
+Adapter: PCI adapter
+Tctl:        +101.5°F
+Tccd1:        +87.8°F
+
+r8169_0_700:00-mdio-0
+Adapter: MDIO adapter
+temp1:       +117.5°F  (high = +248.0°F)
+
+hwmon0 = acpitz
+    temp1_input
+
+hwmon1 = r8169_0_700:00
+    temp1_input
+
+hwmon2 = nvme
+    temp1_input
+    temp2_input
+    temp3_input
+
+hwmon3 = k10temp
+    temp1_input
+    temp3_input
+
+hwmon4 = gigabyte_wmi
+    temp1_input
+    temp2_input
+    temp3_input
+    temp4_input
+    temp5_input
+
+hwmon5 = amdgpu
+    fan1_input
+    freq1_input
+    freq2_input
+    in0_input
+    power1_input
+    temp1_input
+
