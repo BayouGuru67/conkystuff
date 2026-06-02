@@ -34,8 +34,8 @@ local BAR_STYLE = {
 }
 
 local LEDS = {
-    {x = 210, y = 15,  sensor = '${hwmon 4 temp 1}', thresholds = {green = 140, red = 155}},
-    {x = 210, y = 147, sensor = '${hwmon 0 temp 1}', thresholds = {green = 170, red = 190}},
+    {x = 210, y = 15,  sensor = '${hwmon 4 temp 1}', thresholds = {green = 140, red = 155}},  -- Gigabyte WMI temp1 (VRM/NB)
+    {x = 210, y = 147, sensor = '${hwmon 3 temp 1}', thresholds = {green = 175, red = 190}},  -- k10temp Tctl (CPU)
 }
 
 -- === PRECOMPUTED ANGLES ===
