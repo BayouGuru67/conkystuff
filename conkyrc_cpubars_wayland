@@ -1,15 +1,15 @@
 --
 --  BayouGuru's New Modular Conky Config - CPU Section (Wayland)!
---  version:  2026-06-02.1430
+--  version:  2026-06-02.1445
 --  Optimized for Wayland compositors (GNOME, KDE Plasma, Hyprland, etc.)
+--  Using AMD RX580 discrete GPU only (card1)
 --
 --  Sensor Cross Reference & Capabilities Chart:
---  hwmon0 - amdgpu - AMD GPU              -  fan, temp, freq, in, power, pwm
 --  hwmon1 - r8169_0_700 - Ethernet        -  temp
 --  hwmon2 - nvme - NVMe SSD               -  temp (3 sensors)
 --  hwmon3 - k10temp - AMD CPU             -  temp (Tctl, Tccd1)
 --  hwmon4 - gigabyte_wmi - Motherboard    -  temp (5 sensors: VRM, VDD, NB, etc.)
---  hwmon5 - amdgpu - AMD GPU (alternate)  -  fan, freq, in, power, temp
+--  card1   - AMD RX580 GPU (discrete)     -  busypercent, temp via sysfs
 --
 conky.config = {
 -- Wayland environment - no X11 display needed
@@ -62,6 +62,6 @@ lua_load = '/home/bayouguru/.conky/conkycpubars_wayland.lua',
 conky.text = [[
 ${color3}${template0}${execi 86400 cat /proc/cpuinfo | grep 'model name' | sed -e 's/model name.*: //' | sed -e 's/Processor//'  | sed -e 's/(tm)/™/' | sed -e 's/(R)//' | sed -e 's/CPU//' | sed -e 's/@/:/' | sed -e 's/\ \ //' | sed -e 's/[0-9].[0-9][0-9]GHz//'|uniq}${color2}${alignr}${hwmon 3 temp 1}${color1}°F
 ${lua conky_cpu_bars_wayland}
-${voffset 5}${color3}${template0}AMD RX6700${color2}${alignr}${hwmon 0 temp 1}${color1}°F
+${voffset 5}${color3}${template0}AMD RX580${color2}${alignr}${exec cat /sys/class/drm/card1/device/temp}${color1}°C
 ${template1}├
-└${font} ${color1}Freq ${color2}${if_match ${hwmon 5 freq 1 0.000001 1} < 1000} ${endif}${hwmon 5 freq 1 0.000001 1}${color1}MHz${alignr}${color1}Power ${color2}${hwmon 5 power 1 0.000001 1}${color1}W${voffset -6}]]
+└${font} ${color1}Usage ${color2}${exec cat /sys/class/drm/card1/device/gpu_busy_percent}${color1}%${alignr}${color1}Memory ${color2}${exec cat /sys/class/drm/card1/device/mem_info_vram_used | awk '{print $1/1024/1024" MB"}'}}${color1}${voffset -6}]]
