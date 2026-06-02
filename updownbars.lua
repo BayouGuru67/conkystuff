@@ -12,13 +12,13 @@ local COLORS = {
 }
 local BAR_CONFIG = {
     {
-        xb = 60, yb = 220, name = 'upspeedf', arg = 'enp4s0', max = 20000, nb_blocks = 48,
+        xb = 60, yb = 220, name = 'upspeedf', arg = 'enp7s0', max = 20000, nb_blocks = 48,
         cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 4, space = 1,
         warning = 75, alarm = 90,
         led_effect = true, led_alpha = 0.8, rotation = 90
     },
     {
-        xb = 60, yb = 238, name = 'downspeedf', arg = 'enp4s0', max = 100000, nb_blocks = 48,
+        xb = 60, yb = 238, name = 'downspeedf', arg = 'enp7s0', max = 100000, nb_blocks = 48,
         cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 4, space = 1,
         warning = 75, alarm = 90,
         led_effect = true, led_alpha = 0.8, rotation = 90
@@ -63,7 +63,7 @@ end
 
 -- NETWORK CONNECTED
 local function is_network_connected()
-    local ip = conky_parse('${addr enp4s0}')
+    local ip = conky_parse('${addr enp7s0}')
     return (ip and ip ~= '' and ip ~= '0.0.0.0')
 end
 
