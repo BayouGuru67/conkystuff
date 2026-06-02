@@ -1,0 +1,67 @@
+--
+--  BayouGuru's New Modular Conky Config - CPU Section (Wayland)!
+--  version:  2026-06-02.1430
+--  Optimized for Wayland compositors (GNOME, KDE Plasma, Hyprland, etc.)
+--
+--  Sensor Cross Reference & Capabilities Chart:
+--  hwmon0 - amdgpu - AMD GPU              -  fan, temp, freq, in, power, pwm
+--  hwmon1 - r8169_0_700 - Ethernet        -  temp
+--  hwmon2 - nvme - NVMe SSD               -  temp (3 sensors)
+--  hwmon3 - k10temp - AMD CPU             -  temp (Tctl, Tccd1)
+--  hwmon4 - gigabyte_wmi - Motherboard    -  temp (5 sensors: VRM, VDD, NB, etc.)
+--  hwmon5 - amdgpu - AMD GPU (alternate)  -  fan, freq, in, power, temp
+--
+conky.config = {
+-- Wayland environment - no X11 display needed
+update_interval = 0.5,
+cpu_avg_samples = 1,
+total_run_times = 0,
+alignment = "top_left",
+gap_x = 3,
+gap_y = 1,
+minimum_width = 260,
+maximum_width = 260,
+own_window = true,
+own_window_type = "normal",
+own_window_title = "CPU-Conky",
+own_window_hints = "undecorated,below,sticky,skip_taskbar,skip_pager",
+own_window_transparent = false,
+own_window_argb_visual = true,
+own_window_argb_value = 192,
+show_graph_scale = false,
+double_buffer = true,
+text_buffer_size = 256,
+no_buffers = false,
+use_xft = true,
+font = "Larabiefont-Regular:bold:size=11",
+short_units = true,
+temperature_unit = "fahrenheit",
+forced_redraw = false,
+draw_graph_borders = false,
+draw_outline = false,
+draw_shades = false,
+draw_borders = false,
+border_inner_margin = 2,
+border_outer_margin = 1,
+border_width = 1,
+own_window_colour = "111111",
+default_outline_color = "000000",
+default_color = "212121",
+default_shade_color = "070707",
+color0 = '111111',                                          -- Dark Gray - Background
+color1 = 'lightblue',                                       -- Light Blue - Labels
+color2 = 'orange',                                          -- Orange - Monitored Item (Frequently Updates)
+color3 = 'white',                                           -- White - Headers
+color4 = 'SteelBlue',                                       -- Blue - ANSI Header Art
+template0 = '${font Larabiefont-Regular:bold:size=10}',     -- Standard font
+template1 = '${color4}${font Arial:size=10}',               -- ANSI corner
+-- Wayland: Use text-based Lua instead of Cairo graphics
+lua_load = '/home/bayouguru/.conky/conkycpubars_wayland.lua',
+}
+
+conky.text = [[
+${color3}${template0}${execi 86400 cat /proc/cpuinfo | grep 'model name' | sed -e 's/model name.*: //' | sed -e 's/Processor//'  | sed -e 's/(tm)/™/' | sed -e 's/(R)//' | sed -e 's/CPU//' | sed -e 's/@/:/' | sed -e 's/\ \ //' | sed -e 's/[0-9].[0-9][0-9]GHz//'|uniq}${color2}${alignr}${hwmon 3 temp 1}${color1}°F
+${lua conky_cpu_bars_wayland}
+${voffset 5}${color3}${template0}AMD RX6700${color2}${alignr}${hwmon 0 temp 1}${color1}°F
+${template1}├
+└${font} ${color1}Freq ${color2}${if_match ${hwmon 5 freq 1 0.000001 1} < 1000} ${endif}${hwmon 5 freq 1 0.000001 1}${color1}MHz${alignr}${color1}Power ${color2}${hwmon 5 power 1 0.000001 1}${color1}W${voffset -6}]]
