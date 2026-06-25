@@ -8,8 +8,8 @@ require 'cairo'
 local STRIPE_COLOR = {0.431, 0.133, 0.710, 0.30} -- Purple with 30% opacity
 
 local SECTIONS = {
-    {start_y = 31,  line_height = 16, total_width = 256, lines = 10}, -- RAM
-    {start_y = 207, line_height = 16, total_width = 256, lines = 10}, -- CPU
+    {start_y = 31,  line_height = 16, total_width = 256, lines = 5}, -- RAM
+    {start_y = 127, line_height = 16, total_width = 256, lines = 10}, -- CPU
 }
 
 local function draw_stripes(cr, section)

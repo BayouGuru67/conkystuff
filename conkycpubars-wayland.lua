@@ -19,7 +19,7 @@ local CPU_BAR_POSITIONS = {
     {140, 136, 'cpu10', 25},
     {8,   165, 'cpu11', 25},
     {140, 165, 'cpu12', 25},
-    {8,   193, 'cpu0',  51},  -- Average
+    {8,   193, 'cpu',  51},  -- Average
 }
 
 -- GPU bar positions
