@@ -1,137 +1,58 @@
--- Top Processes Display for Wayland (Conky Text-based)
--- Compatible with all Wayland compositors
+require 'cairo'
 
--- === CONFIGURATION ===
-local COLORS = {
-    header  = '${color6}',
-    normal  = '${color}',
-    warning = '${color4}',
-    critical = '${color1}',
-    reset   = '${color}',
+-- ==========================================================
+-- BayouGuru's Top CPU/RAM Conky Background Stripes
+-- Wayland Display Output Version
+-- ==========================================================
+
+local STRIPE_COLOR = {0.431, 0.133, 0.710, 0.30} -- Purple with 30% opacity
+
+local SECTIONS = {
+    {start_y = 31,  line_height = 16, total_width = 256, lines = 10}, -- RAM
+    {start_y = 207, line_height = 16, total_width = 256, lines = 10}, -- CPU
 }
 
-local DISPLAY_LINES = 10  -- Number of processes to show in each section
+local function draw_stripes(cr, section)
+cairo_set_operator(cr, CAIRO_OPERATOR_OVER)
 
--- === HELPER FUNCTIONS ===
-local function format_memory(mem_kb)
-    if mem_kb >= 1000000 then
-        return string.format('%6.1f G', mem_kb / 1000000)
-    elseif mem_kb >= 1000 then
-        return string.format('%6.1f M', mem_kb / 1000)
-    else
-        return string.format('%6.1f K', mem_kb)
-    end
-end
+for i = 0, section.lines - 1 do
+    if (i % 2) == 1 then
+        cairo_set_source_rgba(
+            cr,
+            STRIPE_COLOR[1],
+            STRIPE_COLOR[2],
+            STRIPE_COLOR[3],
+            STRIPE_COLOR[4]
+        )
 
-local function get_color_for_percentage(pct, warning, critical)
-    if pct >= critical then
-        return COLORS.critical
-    elseif pct >= warning then
-        return COLORS.warning
-    else
-        return COLORS.normal
-    end
-end
+        cairo_rectangle(
+            cr,
+            8,
+            section.start_y + (i * section.line_height),
+                        section.total_width,
+                        section.line_height
+        )
 
--- === MAIN OUTPUT FUNCTION ===
-function conky_top_processes_wayland()
-    local output = ''
-    
-    -- Header
-    output = output .. COLORS.header .. '${font Larabiefont:size=11}TOP PROCESSES${font}' .. COLORS.reset .. '\n'
-    output = output .. '${hr 2}\n'
-    
-    -- Memory usage header
-    output = output .. COLORS.header .. 'TOP MEMORY CONSUMERS:' .. COLORS.reset .. '\n'
-    
-    -- Top memory processes
-    for i = 1, DISPLAY_LINES do
-        local proc_name = conky_parse('${top_mem name ' .. i .. '}')
-        local proc_mem = tonumber(conky_parse('${top_mem mem ' .. i .. '}')) or 0
-        local proc_pid = conky_parse('${top_mem pid ' .. i .. '}')
-        
-        if proc_name and proc_name ~= '' then
-            output = output .. string.format('%s%-20s %s %s\n',
-                COLORS.normal,
-                proc_name:sub(1, 20),
-                format_memory(tonumber(conky_parse('${top_mem mem_res ' .. i .. '}')) or 0),
-                proc_pid
-            )
+        cairo_fill(cr)
         end
-    end
-    
-    output = output .. '\n'
-    
-    -- CPU usage header
-    output = output .. COLORS.header .. 'TOP CPU CONSUMERS:' .. COLORS.reset .. '\n'
-    
-    -- Top CPU processes
-    for i = 1, DISPLAY_LINES do
-        local proc_name = conky_parse('${top name ' .. i .. '}')
-        local proc_cpu = tonumber(conky_parse('${top cpu ' .. i .. '}')) or 0
-        local proc_pid = conky_parse('${top pid ' .. i .. '}')
-        
-        if proc_name and proc_name ~= '' then
-            local cpu_color = get_color_for_percentage(proc_cpu, 25, 50)
-            output = output .. string.format('%s%-20s %s%% %s\n',
-                COLORS.normal,
-                proc_name:sub(1, 20),
-                cpu_color,
-                string.format('%6.1f', proc_cpu),
-                proc_pid
-            )
         end
-    end
-    
-    output = output .. COLORS.reset
-    return output
-end
+        end
 
--- Alternative compact version (single section)
-function conky_top_cpu_processes_wayland()
-    local output = ''
-    
-    output = output .. COLORS.header .. 'Top CPU Processes:' .. COLORS.reset .. '\n'
-    
-    for i = 1, 5 do
-        local proc_name = conky_parse('${top name ' .. i .. '}')
-        local proc_cpu = tonumber(conky_parse('${top cpu ' .. i .. '}')) or 0
-        
-        if proc_name and proc_name ~= '' then
-            local cpu_color = get_color_for_percentage(proc_cpu, 25, 50)
-            output = output .. string.format('  %s%-18s %s%5.1f%%\n',
-                COLORS.normal,
-                proc_name:sub(1, 18),
-                cpu_color,
-                proc_cpu
-            )
-        end
-    end
-    
-    output = output .. COLORS.reset
-    return output
-end
+        function conky_draw_pre()
+        -- Use the backend-neutral conky_surface() function
+        local surface = conky_surface()
+        if not surface then
+            return
+            end
 
-function conky_top_mem_processes_wayland()
-    local output = ''
-    
-    output = output .. COLORS.header .. 'Top Memory Processes:' .. COLORS.reset .. '\n'
-    
-    for i = 1, 5 do
-        local proc_name = conky_parse('${top_mem name ' .. i .. '}')
-        local proc_mem_pct = tonumber(conky_parse('${top_mem mem_perc ' .. i .. '}')) or 0
-        
-        if proc_name and proc_name ~= '' then
-            local mem_color = get_color_for_percentage(proc_mem_pct, 10, 25)
-            output = output .. string.format('  %s%-18s %s%5.1f%%\n',
-                COLORS.normal,
-                proc_name:sub(1, 18),
-                mem_color,
-                proc_mem_pct
-            )
-        end
-    end
-    
-    output = output .. COLORS.reset
-    return output
-end
+            local cr = cairo_create(surface)
+            if not cr then
+                return
+                end
+
+                for _, section in ipairs(SECTIONS) do
+                    draw_stripes(cr, section)
+                    end
+
+                    cairo_destroy(cr)
+                    end
