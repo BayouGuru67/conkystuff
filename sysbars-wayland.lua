@@ -6,24 +6,24 @@ require 'cairo'
 
 -- Bar positions: {xb, yb, name, arg, max, nb_blocks}
 local BAR_CONFIG = {
-    {xb = 18, yb = 112, name = 'memperc',        arg = '',                              max = 100, nb_blocks = 49},
-    {xb = 18, yb = 235, name = 'fs_used_perc',   arg = '/',                             max = 100, nb_blocks = 49},
-    {xb = 18, yb = 303, name = 'fs_used_perc',   arg = '/home/bayouguru/PNY-500Gb/',    max = 100, nb_blocks = 49},
-    {xb = 18, yb = 371, name = 'swapperc',       arg = '',                              max = 100, nb_blocks = 49},
+    {xb = 18, yb = 128, name = 'memperc',        arg = '',                              max = 100, nb_blocks = 49},
+    {xb = 18, yb = 251, name = 'fs_used_perc',   arg = '/',                             max = 100, nb_blocks = 49},
+    {xb = 18, yb = 319, name = 'fs_used_perc',   arg = '/home/bayouguru/PNY-500Gb/',    max = 100, nb_blocks = 49},
+    {xb = 18, yb = 387, name = 'swapperc',       arg = '',                              max = 100, nb_blocks = 49},
 }
 
 -- LED positions
 -- For temperature sensors, thresholds are in Fahrenheit
 -- For keyboard LEDs, we use the 'path' field instead of 'sensor'
 local LEDS = {
-    -- Storage temperature sensors (using conky_parse)
-    {x = 90,   y = 7, sensor = '${hwmon 2 temp 1}', thresholds = {green = 158, red = 185}, label = 'NVMe'},
-    {x = 186,   y = 7, sensor = '${hwmon 3 temp 1}', thresholds = {green = 140, red = 167}, label = 'PNY'},
-    {x = 203,   y = 223, sensor = '${hwmon 2 temp 1}', thresholds = {green = 158, red = 185}, label = 'NVMe'},
-    {x = 203,   y = 290, sensor = '${hwmon 3 temp 1}', thresholds = {green = 140, red = 167}, label = 'PNY'},
+    -- Ssystem temperature sensors
+    {x = 90,   y = 7, sensor = '${hwmon 6 temp 3}', thresholds = {green = 158, red = 185}, label = 'Skt'},
+    {x = 186,   y = 7, sensor = '${hwmon 6 temp 1}', thresholds = {green = 140, red = 167}, label = 'Brd'},
+    {x = 211,   y = 239, sensor = '${hwmon 2 temp 1}', thresholds = {green = 158, red = 185}, label = 'NVMe'},
+    {x = 211,   y = 306, sensor = '${hwmon 3 temp 1}', thresholds = {green = 140, red = 167}, label = 'PNY'},
     -- Keyboard LEDs (reading directly from sysfs)
-    {x = 120,  y = 39,  path = '/sys/class/leds/input4::capslock/brightness', label = 'CapsLock'},
-    {x = 250,  y = 39,  path = '/sys/class/leds/input4::numlock/brightness',  label = 'NumLock'},
+    {x = 120,  y = 55,  path = '/sys/class/leds/input4::capslock/brightness', label = 'CapsLock'},
+    {x = 250,  y = 55,  path = '/sys/class/leds/input4::numlock/brightness',  label = 'NumLock'},
 }
 
 -- Bar style
@@ -239,4 +239,5 @@ for pt = 1, nb_blocks do
                                                                                                                 end
 
                                                                                                                 cairo_destroy(cr)
-                                                                                                                end
+    cairo_surface_flush(surface)
+    end

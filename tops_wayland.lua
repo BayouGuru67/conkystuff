@@ -55,4 +55,5 @@ for i = 0, section.lines - 1 do
                     end
 
                     cairo_destroy(cr)
-                    end
+    cairo_surface_flush(surface)
+    end
