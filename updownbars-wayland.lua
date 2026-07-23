@@ -12,20 +12,20 @@ local COLORS = {
 
 local BAR_CONFIG = {
     {
-        xb = 52, yb = 225, name = 'upspeedf', arg = 'enp7s0', max = 20000, nb_blocks = 40,
-        cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 4, space = 1,
+        xb = 52, yb = 209, name = 'upspeedf', arg = 'enp7s0', max = 20000, nb_blocks = 50,
+        cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 3, space = 1,
         warning = 75, alarm = 90,
         led_effect = true, led_alpha = 0.8, rotation = 90
     },
     {
-        xb = 52, yb = 241, name = 'downspeedf', arg = 'enp7s0', max = 100000, nb_blocks = 40,
-        cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 4, space = 1,
+        xb = 52, yb = 225, name = 'downspeedf', arg = 'enp7s0', max = 100000, nb_blocks = 50,
+        cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 3, space = 1,
         warning = 75, alarm = 90,
         led_effect = true, led_alpha = 0.8, rotation = 90
     }
 }
 
-local BG_STRIPE = {start_x = 8, start_y = 271, pair_height = 34, total_width = 252}
+local BG_STRIPE = {start_x = 8, start_y = 254, pair_height = 33, total_width = 251}
 
 -- Precompute bar parameters once at load time
 for _, params in ipairs(BAR_CONFIG) do
@@ -35,6 +35,58 @@ for _, params in ipairs(BAR_CONFIG) do
     params._sin_angle = math.sin(params._angle)
     params._y_step = params.h + params.space
     params._pcb = 100 / params.nb_blocks
+end
+
+-- ============================================================
+-- PRECOMPUTE BLOCK GEOMETRY AND COLORS AT LOAD TIME
+-- ============================================================
+
+local bar_geometry = {}
+local bar_colors = {}
+local led_data = {}
+
+for bar_idx, params in ipairs(BAR_CONFIG) do
+    local blocks = {}
+    local active_colors = {}
+    local inactive_colors = {}
+    local leds = {}
+
+    for pt = 1, params.nb_blocks do
+        local radius0 = pt * params._y_step
+        local x2 = params.xb + radius0 * params._sin_angle
+        local y2 = params.yb - radius0 * params._cos_angle
+        local w = params.w
+        local xx0, xx1 = x2, x2 + w * params._cos_angle
+        local yy0, yy1 = y2, y2 + w * params._sin_angle
+
+        blocks[pt] = {x2 = x2, y2 = y2, xx0 = xx0, xx1 = xx1, yy0 = yy0, yy1 = yy1}
+
+        -- Precompute active color for this block
+        local blockStartPercentage = (pt - 1) * params._pcb
+        local color
+        if blockStartPercentage < params.warning then
+            color = COLORS.green
+        elseif blockStartPercentage < params.alarm then
+            color = COLORS.yellow
+        else
+            color = COLORS.red
+        end
+        active_colors[pt] = color
+
+        -- Inactive color is always bg
+        inactive_colors[pt] = COLORS.bg
+
+        -- Precompute LED data
+        local xc, yc = (xx0 + xx1) / 2, (yy0 + yy1) / 2
+        leds[pt] = {xc = xc, yc = yc, radius = w / 2}
+    end
+
+    bar_geometry[bar_idx] = blocks
+    bar_colors[bar_idx] = {
+        active = active_colors,
+        inactive = inactive_colors
+    }
+    led_data[bar_idx] = leds
 end
 
 -- Cache for connection data
@@ -130,7 +182,7 @@ end
 
 function conky_limit_connections(max_in, max_total)
     max_in = tonumber(max_in) or 6
-    max_total = tonumber(max_total) or 25
+    max_total = tonumber(max_total) or 22
 
     last_display_entries = get_displayed_connections(max_in, max_total)
 
@@ -150,11 +202,11 @@ function conky_limit_connections(max_in, max_total)
         local host = (info.host and info.host ~= "") and info.host or ""
 
         if entry.direction == "in" then
-            table.insert(out, "${goto 4}${color6}${template4}├${color yellow}${template2}In${template4} ←${color2} ${template2}"
+            table.insert(out, "${goto 4}${color6}${template4}├${color yellow}${template2}In${template4}${voffset -2} ←${voffset -0}${color2} ${template2}"
                 .. display_ip .. "${alignr 4}" .. service .. "\n"
                 .. "${goto 4}${template4}└ ${color3}${template3}" .. host .. "\n")
         else
-            table.insert(out, "${color6}${template4}├${color5}${template2}Out${template4} →${color2} ${template2}"
+            table.insert(out, "${color6}${template4}├${color5}${template2}Out${template4}${voffset -2} →${voffset -0}${color2} ${template2}"
                 .. display_ip .. "${alignr 4}" .. service .. "\n"
                 .. "${template4}└ ${color3}${template3}" .. host .. "\n")
         end
@@ -163,8 +215,10 @@ function conky_limit_connections(max_in, max_total)
     return table.concat(out)
 end
 
--- COMBINED DRAW HOOK - does both background stripes AND bars in one pass
-function conky_draw_post()
+-- ============================================================
+-- PRE-HOOK: Draw background stripes UNDER the text
+-- ============================================================
+function conky_draw_pre()
     local surface = conky_surface()
     if not surface then
         return
@@ -175,7 +229,7 @@ function conky_draw_post()
         return
     end
 
-    -- Draw background stripes FIRST (moved from conky_draw_pre)
+    -- Draw background stripes (UNDER text)
     if last_display_entries and #last_display_entries > 0 then
         cairo_set_source_rgba(cr, table.unpack(COLORS.bar_bg))
         for idx = 1, #last_display_entries do
@@ -187,8 +241,26 @@ function conky_draw_post()
         end
     end
 
-    -- Draw speed bars
-    for _, params in ipairs(BAR_CONFIG) do
+    cairo_destroy(cr)
+    cairo_surface_flush(surface)
+end
+
+-- ============================================================
+-- POST-HOOK: Draw speed bars OVER the text
+-- ============================================================
+function conky_draw_post()
+    local surface = conky_surface()
+    if not surface then
+        return
+    end
+
+    local cr = cairo_create(surface)
+    if not cr then
+        return
+    end
+
+    -- Draw speed bars using precomputed data (OVER text)
+    for bar_idx, params in ipairs(BAR_CONFIG) do
         local value = tonumber(conky_parse(string.format('${%s %s}', params.name, params.arg))) or 0
         local log_value = (value > 0) and math.log(value + 1) or 0
         local pct = 100 * log_value / params._log_max
@@ -196,44 +268,34 @@ function conky_draw_post()
         cairo_set_line_width(cr, params.h)
         cairo_set_line_cap(cr, params.cap)
 
+        local blocks = bar_geometry[bar_idx]
+        local colors = bar_colors[bar_idx]
+        local leds = led_data[bar_idx]
+        local w = params.w
+
         for pt = 1, params.nb_blocks do
             local blockStartPercentage = (pt - 1) * params._pcb
+            local block = blocks[pt]
 
-            local color
-            if pct >= blockStartPercentage then
-                if blockStartPercentage < params.warning then
-                    color = COLORS.green
-                elseif blockStartPercentage < params.alarm then
-                    color = COLORS.yellow
-                else
-                    color = COLORS.red
-                end
-            else
-                color = COLORS.bg
-            end
+            -- Use precomputed color based on whether block is lit
+            local color = (pct >= blockStartPercentage) and colors.active[pt] or colors.inactive[pt]
 
-            local radius0 = pt * params._y_step
-            local x2 = params.xb + radius0 * params._sin_angle
-            local y2 = params.yb - radius0 * params._cos_angle
-
+            -- Draw the block
             local r, g, b, a = table.unpack(color)
-            local w = params.w
-            local xx0, xx1 = x2, x2 + w * params._cos_angle
-            local yy0, yy1 = y2, y2 + w * params._sin_angle
-
-            local pat = cairo_pattern_create_linear(xx0, yy0, xx0, yy1)
+            local pat = cairo_pattern_create_linear(block.xx0, block.yy0, block.xx0, block.yy1)
             cairo_pattern_add_color_stop_rgba(pat, 0, r, g, b, a * 0.4)
             cairo_pattern_add_color_stop_rgba(pat, 0.5, r, g, b, a)
             cairo_pattern_add_color_stop_rgba(pat, 1, r, g, b, a * 0.4)
             cairo_set_source(cr, pat)
-            cairo_move_to(cr, xx0, yy0)
-            cairo_line_to(cr, xx1, yy1)
+            cairo_move_to(cr, block.xx0, block.yy0)
+            cairo_line_to(cr, block.xx1, block.yy1)
             cairo_stroke(cr)
             cairo_pattern_destroy(pat)
 
-            if params.led_effect then
-                local xc, yc = (xx0 + xx1) / 2, (yy0 + yy1) / 2
-                local led_pat = cairo_pattern_create_radial(xc, yc, 0, xc, yc, w / 2)
+            -- LED effect (only for active blocks)
+            if params.led_effect and pct >= blockStartPercentage then
+                local led = leds[pt]
+                local led_pat = cairo_pattern_create_radial(led.xc, led.yc, 0, led.xc, led.yc, led.radius)
                 cairo_pattern_add_color_stop_rgba(led_pat, 0, r, g, b, params.led_alpha)
                 cairo_pattern_add_color_stop_rgba(led_pat, 1, r, g, b, a)
                 cairo_set_source(cr, led_pat)

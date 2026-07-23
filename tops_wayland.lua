@@ -1,59 +1,40 @@
 require 'cairo'
 
--- ==========================================================
--- BayouGuru's Top CPU/RAM Conky Background Stripes
--- Wayland Display Output Version
--- ==========================================================
-
-local STRIPE_COLOR = {0.431, 0.133, 0.710, 0.30} -- Purple with 30% opacity
+local STRIPE_COLOR = {0.431, 0.133, 0.710, 0.30}
 
 local SECTIONS = {
-    {start_y = 31,  line_height = 16, total_width = 256, lines = 5}, -- RAM
-    {start_y = 127, line_height = 16, total_width = 256, lines = 10}, -- CPU
+    {start_y = 31,  line_height = 16, total_width = 256, lines = 5},
+    {start_y = 127, line_height = 16, total_width = 256, lines = 10},
 }
 
-local function draw_stripes(cr, section)
-cairo_set_operator(cr, CAIRO_OPERATOR_OVER)
-
-for i = 0, section.lines - 1 do
-    if (i % 2) == 1 then
-        cairo_set_source_rgba(
-            cr,
-            STRIPE_COLOR[1],
-            STRIPE_COLOR[2],
-            STRIPE_COLOR[3],
-            STRIPE_COLOR[4]
-        )
-
-        cairo_rectangle(
-            cr,
-            8,
-            section.start_y + (i * section.line_height),
-                        section.total_width,
-                        section.line_height
-        )
-
-        cairo_fill(cr)
+-- Precompute stripe positions at load time
+local STRIPE_POSITIONS = {}
+for _, section in ipairs(SECTIONS) do
+    for i = 0, section.lines - 1 do
+        if (i % 2) == 1 then
+            table.insert(STRIPE_POSITIONS, {
+                y = section.start_y + (i * section.line_height),
+                w = section.total_width,
+                h = section.line_height
+            })
         end
-        end
-        end
-
-        function conky_draw_pre()
-        -- Use the backend-neutral conky_surface() function
-        local surface = conky_surface()
-        if not surface then
-            return
-            end
-
-            local cr = cairo_create(surface)
-            if not cr then
-                return
-                end
-
-                for _, section in ipairs(SECTIONS) do
-                    draw_stripes(cr, section)
-                    end
-
-                    cairo_destroy(cr)
-    cairo_surface_flush(surface)
     end
+end
+
+function conky_draw_pre()
+    local surface = conky_surface()
+    if not surface then return end
+    local cr = cairo_create(surface)
+    if not cr then return end
+
+    cairo_set_operator(cr, CAIRO_OPERATOR_OVER)
+    cairo_set_source_rgba(cr, table.unpack(STRIPE_COLOR))
+
+    for _, pos in ipairs(STRIPE_POSITIONS) do
+        cairo_rectangle(cr, 8, pos.y, pos.w, pos.h)
+        cairo_fill(cr)
+    end
+
+    cairo_destroy(cr)
+    cairo_surface_flush(surface)
+end
