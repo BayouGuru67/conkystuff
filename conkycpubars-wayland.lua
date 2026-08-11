@@ -39,9 +39,9 @@ local GPU_BAR_POSITIONS = {
 
 -- LED positions: {x, y, sensor, thresholds}
 local LED_POSITIONS = {
-    {x = 210, y = 10,  sensor = '${hwmon 4 temp 1}', thresholds = {green = 140, red = 155}},
-    {x = 210, y = 223, sensor = '${hwmon 7 temp 1}', thresholds = {green = 140, red = 155}},
-    {x = 210, y = 269, sensor = '${hwmon 8 temp 1}', thresholds = {green = 140, red = 155}}
+    {x = 210, y = 10,  sensor = '${hwmon 5 temp 1}', thresholds = {green = 140, red = 155}},
+    {x = 210, y = 223, sensor = '${hwmon 5 temp 1}', thresholds = {green = 140, red = 155}},
+    {x = 210, y = 269, sensor = '${hwmon 5 temp 1}', thresholds = {green = 140, red = 155}}
 }
 
 -- Bar style

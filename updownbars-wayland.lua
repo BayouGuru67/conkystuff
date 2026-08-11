@@ -89,7 +89,7 @@ for bar_idx, params in ipairs(BAR_CONFIG) do
     led_data[bar_idx] = leds
 end
 
--- Cache for connection data
+-- Cache for connection data - FIXED: use separate sync flag
 local conn_cache = {
     last_update = -1,
     in_table = {},
@@ -98,22 +98,49 @@ local conn_cache = {
     out_order = {}
 }
 
-local last_sync_update = -1
 local last_display_entries = {}
+local sync_pending = false
+
+-- Network status cache
+local network_cache = {last_update = -1, connected = false}
+
+-- Speed value cache
+local speed_cache = {last_update = -1, up = 0, down = 0}
 
 local function get_update_number()
     return tonumber(conky_parse("${updates}")) or 0
 end
 
-function conky_sync_connections()
+-- Cached network status check
+local function is_network_connected()
     local upd = get_update_number()
-    if last_sync_update ~= upd then
-        last_sync_update = upd
-        conn_cache.last_update = -1
+    if network_cache.last_update == upd then
+        return network_cache.connected
     end
+    local ip = conky_parse('${addr enp7s0}')
+    network_cache.connected = (ip and ip ~= '' and ip ~= '0.0.0.0')
+    network_cache.last_update = upd
+    return network_cache.connected
+end
+
+-- Cache speed values - original parsing method, just cached
+local function get_cached_speeds()
+    local upd = get_update_number()
+    if speed_cache.last_update ~= upd then
+        speed_cache.up = tonumber(conky_parse('${upspeedf enp7s0}')) or 0
+        speed_cache.down = tonumber(conky_parse('${downspeedf enp7s0}')) or 0
+        speed_cache.last_update = upd
+    end
+    return speed_cache.up, speed_cache.down
+end
+
+function conky_sync_connections()
+    -- Just mark that we need to sync, don't invalidate cache here
+    sync_pending = true
     return ""
 end
 
+-- OPTIMIZED: Only do service/host lookups for NEW IPs, not duplicates
 local function collect_connections(start_port, end_port, max_display)
     local total_conns = tonumber(conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " count}")) or 0
     if total_conns == 0 then
@@ -133,11 +160,13 @@ local function collect_connections(start_port, end_port, max_display)
 
         if rip and rip ~= "" then
             if not ip_table[rip] then
+                -- ONLY do service/host lookups for NEW IPs
                 local rservice = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rservice " .. i .. "}") or ""
                 local rhost = conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " rhost " .. i .. "}") or ""
                 ip_table[rip] = {count = 1, service = rservice, host = rhost}
                 table.insert(order, rip)
             else
+                -- For duplicates, just increment count - no expensive lookups!
                 ip_table[rip].count = ip_table[rip].count + 1
             end
         end
@@ -148,7 +177,8 @@ end
 
 local function get_cached_connections(max_in, max_total)
     local upd = get_update_number()
-    if conn_cache.last_update ~= upd then
+    -- Only re-parse if update number changed OR sync was requested
+    if conn_cache.last_update ~= upd or sync_pending then
         local in_table, in_order = collect_connections(1, 32767, max_total)
         local out_table, out_order = collect_connections(32768, 61000, max_total)
         conn_cache.in_table = in_table
@@ -156,6 +186,7 @@ local function get_cached_connections(max_in, max_total)
         conn_cache.out_table = out_table
         conn_cache.out_order = out_order
         conn_cache.last_update = upd
+        sync_pending = false
     end
     return conn_cache.in_table, conn_cache.in_order, conn_cache.out_table, conn_cache.out_order
 end
@@ -190,6 +221,7 @@ function conky_limit_connections(max_in, max_total)
         return ""
     end
 
+    -- Use table.concat for efficiency
     local out = {}
     for _, entry in ipairs(last_display_entries) do
         local info = entry.info
@@ -224,21 +256,30 @@ function conky_draw_pre()
         return
     end
 
+    if not is_network_connected() then
+        return
+    end
+
+    if not last_display_entries or #last_display_entries == 0 then
+        return
+    end
+
     local cr = cairo_create(surface)
     if not cr then
         return
     end
 
-    -- Draw background stripes (UNDER text)
-    if last_display_entries and #last_display_entries > 0 then
-        cairo_set_source_rgba(cr, table.unpack(COLORS.bar_bg))
-        for idx = 1, #last_display_entries do
-            if idx % 2 == 0 then
-                local y_pos = BG_STRIPE.start_y + ((idx - 1) * BG_STRIPE.pair_height)
-                cairo_rectangle(cr, BG_STRIPE.start_x, y_pos, BG_STRIPE.total_width, BG_STRIPE.pair_height)
-                cairo_fill(cr)
-            end
-        end
+    cairo_set_source_rgba(cr, table.unpack(COLORS.bar_bg))
+
+    local start_x = BG_STRIPE.start_x
+    local start_y = BG_STRIPE.start_y
+    local pair_height = BG_STRIPE.pair_height
+    local total_width = BG_STRIPE.total_width
+
+    for idx = 2, #last_display_entries, 2 do
+        local y_pos = start_y + ((idx - 1) * pair_height)
+        cairo_rectangle(cr, start_x, y_pos, total_width, pair_height)
+        cairo_fill(cr)
     end
 
     cairo_destroy(cr)
@@ -254,14 +295,20 @@ function conky_draw_post()
         return
     end
 
+    if not is_network_connected() then
+        return
+    end
+
     local cr = cairo_create(surface)
     if not cr then
         return
     end
 
-    -- Draw speed bars using precomputed data (OVER text)
+    -- Get cached speed values
+    local up_speed, down_speed = get_cached_speeds()
+
     for bar_idx, params in ipairs(BAR_CONFIG) do
-        local value = tonumber(conky_parse(string.format('${%s %s}', params.name, params.arg))) or 0
+        local value = (bar_idx == 1) and up_speed or down_speed
         local log_value = (value > 0) and math.log(value + 1) or 0
         local pct = 100 * log_value / params._log_max
 
@@ -271,16 +318,13 @@ function conky_draw_post()
         local blocks = bar_geometry[bar_idx]
         local colors = bar_colors[bar_idx]
         local leds = led_data[bar_idx]
-        local w = params.w
 
         for pt = 1, params.nb_blocks do
             local blockStartPercentage = (pt - 1) * params._pcb
             local block = blocks[pt]
 
-            -- Use precomputed color based on whether block is lit
             local color = (pct >= blockStartPercentage) and colors.active[pt] or colors.inactive[pt]
 
-            -- Draw the block
             local r, g, b, a = table.unpack(color)
             local pat = cairo_pattern_create_linear(block.xx0, block.yy0, block.xx0, block.yy1)
             cairo_pattern_add_color_stop_rgba(pat, 0, r, g, b, a * 0.4)
@@ -292,7 +336,6 @@ function conky_draw_post()
             cairo_stroke(cr)
             cairo_pattern_destroy(pat)
 
-            -- LED effect (only for active blocks)
             if params.led_effect and pct >= blockStartPercentage then
                 local led = leds[pt]
                 local led_pat = cairo_pattern_create_radial(led.xc, led.yc, 0, led.xc, led.yc, led.radius)

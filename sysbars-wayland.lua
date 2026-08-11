@@ -17,10 +17,10 @@ local BAR_CONFIG = {
 -- For keyboard LEDs, we use the 'path' field instead of 'sensor'
 local LEDS = {
     -- System temperature sensors
-    {x = 90,   y = 7, sensor = '${hwmon 6 temp 3}', thresholds = {green = 158, red = 185}, label = 'Skt'},
-    {x = 186,   y = 7, sensor = '${hwmon 6 temp 1}', thresholds = {green = 140, red = 167}, label = 'Brd'},
-    {x = 211,   y = 239, sensor = '${hwmon 2 temp 1}', thresholds = {green = 158, red = 185}, label = 'NVMe'},
-    {x = 211,   y = 306, sensor = '${hwmon 3 temp 1}', thresholds = {green = 140, red = 167}, label = 'PNY'},
+    {x = 90,   y = 7, sensor = '${hwmon 5 temp 3}', thresholds = {green = 158, red = 185}, label = 'Skt'},
+    {x = 186,   y = 7, sensor = '${hwmon 5 temp 1}', thresholds = {green = 140, red = 167}, label = 'Brd'},
+    {x = 211,   y = 243, sensor = '${hwmon 5 temp 1}', thresholds = {green = 158, red = 185}, label = 'NVMe'},
+    {x = 211,   y = 310, sensor = '${hwmon 5 temp 1}', thresholds = {green = 140, red = 167}, label = 'PNY'},
     -- Keyboard LEDs (reading directly from sysfs)
     {x = 120,  y = 55,  path = '/sys/class/leds/input4::capslock/brightness', label = 'CapsLock'},
     {x = 250,  y = 55,  path = '/sys/class/leds/input4::numlock/brightness',  label = 'NumLock'},
