@@ -18,7 +18,7 @@ local BAR_CONFIG = {
         led_effect = true, led_alpha = 0.8, rotation = 90
     },
     {
-        xb = 52, yb = 225, name = 'downspeedf', arg = 'enp7s0', max = 100000, nb_blocks = 50,
+        xb = 52, yb = 225, name = 'downspeedf', arg = 'enp7s0', max = 116000, nb_blocks = 50,
         cap = CAIRO_LINE_CAP_SQUARE, w = 9, h = 3, space = 1,
         warning = 75, alarm = 90,
         led_effect = true, led_alpha = 0.8, rotation = 90
@@ -89,9 +89,13 @@ for bar_idx, params in ipairs(BAR_CONFIG) do
     led_data[bar_idx] = leds
 end
 
--- Cache for connection data - FIXED: use separate sync flag
+-- ============================================================
+-- FIXED CACHE MECHANISM
+-- ============================================================
+
+-- Cache for connection data
 local conn_cache = {
-    last_update = -1,
+    update_id = -1,          -- Tracks which update this cache belongs to
     in_table = {},
     in_order = {},
     out_table = {},
@@ -99,13 +103,12 @@ local conn_cache = {
 }
 
 local last_display_entries = {}
-local sync_pending = false
 
 -- Network status cache
-local network_cache = {last_update = -1, connected = false}
+local network_cache = {update_id = -1, connected = false}
 
 -- Speed value cache
-local speed_cache = {last_update = -1, up = 0, down = 0}
+local speed_cache = {update_id = -1, up = 0, down = 0}
 
 local function get_update_number()
     return tonumber(conky_parse("${updates}")) or 0
@@ -114,33 +117,35 @@ end
 -- Cached network status check
 local function is_network_connected()
     local upd = get_update_number()
-    if network_cache.last_update == upd then
+    if network_cache.update_id == upd then
         return network_cache.connected
     end
     local ip = conky_parse('${addr enp7s0}')
     network_cache.connected = (ip and ip ~= '' and ip ~= '0.0.0.0')
-    network_cache.last_update = upd
+    network_cache.update_id = upd
     return network_cache.connected
 end
 
--- Cache speed values - original parsing method, just cached
+-- Cache speed values
 local function get_cached_speeds()
     local upd = get_update_number()
-    if speed_cache.last_update ~= upd then
+    if speed_cache.update_id ~= upd then
         speed_cache.up = tonumber(conky_parse('${upspeedf enp7s0}')) or 0
         speed_cache.down = tonumber(conky_parse('${downspeedf enp7s0}')) or 0
-        speed_cache.last_update = upd
+        speed_cache.update_id = upd
     end
     return speed_cache.up, speed_cache.down
 end
 
+-- This function is called by Conky's ${lua} mechanism.
+-- It now simply returns an empty string, acting as a no-op trigger.
 function conky_sync_connections()
-    -- Just mark that we need to sync, don't invalidate cache here
-    sync_pending = true
+    -- The cache is now validated solely on the update number in get_cached_connections().
+    -- This function exists only to satisfy the ${lua conky_sync_connections} call in the config.
     return ""
 end
 
--- OPTIMIZED: Only do service/host lookups for NEW IPs, not duplicates
+-- OPTIMIZED: Only do service/host lookups for NEW IPs
 local function collect_connections(start_port, end_port, max_display)
     local total_conns = tonumber(conky_parse("${tcp_portmon " .. start_port .. " " .. end_port .. " count}")) or 0
     if total_conns == 0 then
@@ -166,7 +171,6 @@ local function collect_connections(start_port, end_port, max_display)
                 ip_table[rip] = {count = 1, service = rservice, host = rhost}
                 table.insert(order, rip)
             else
-                -- For duplicates, just increment count - no expensive lookups!
                 ip_table[rip].count = ip_table[rip].count + 1
             end
         end
@@ -175,18 +179,18 @@ local function collect_connections(start_port, end_port, max_display)
     return ip_table, order
 end
 
+-- FIXED: Cache is now validated ONLY by the update number.
+-- The sync_pending flag and forced invalidation have been removed.
 local function get_cached_connections(max_in, max_total)
     local upd = get_update_number()
-    -- Only re-parse if update number changed OR sync was requested
-    if conn_cache.last_update ~= upd or sync_pending then
+    if conn_cache.update_id ~= upd then
         local in_table, in_order = collect_connections(1, 32767, max_total)
         local out_table, out_order = collect_connections(32768, 61000, max_total)
         conn_cache.in_table = in_table
         conn_cache.in_order = in_order
         conn_cache.out_table = out_table
         conn_cache.out_order = out_order
-        conn_cache.last_update = upd
-        sync_pending = false
+        conn_cache.update_id = upd
     end
     return conn_cache.in_table, conn_cache.in_order, conn_cache.out_table, conn_cache.out_order
 end
@@ -221,13 +225,12 @@ function conky_limit_connections(max_in, max_total)
         return ""
     end
 
-    -- Use table.concat for efficiency
     local out = {}
     for _, entry in ipairs(last_display_entries) do
         local info = entry.info
         local display_ip = entry.rip
         if info.count > 1 then
-            display_ip = display_ip .. " (" .. info.count .. ")"
+            display_ip = display_ip .. "  -  " .. info.count .. ""
         end
 
         local service = (info.service and info.service ~= "") and info.service or ""
@@ -252,22 +255,14 @@ end
 -- ============================================================
 function conky_draw_pre()
     local surface = conky_surface()
-    if not surface then
-        return
-    end
+    if not surface then return end
 
-    if not is_network_connected() then
-        return
-    end
+    if not is_network_connected() then return end
 
-    if not last_display_entries or #last_display_entries == 0 then
-        return
-    end
+    if not last_display_entries or #last_display_entries == 0 then return end
 
     local cr = cairo_create(surface)
-    if not cr then
-        return
-    end
+    if not cr then return end
 
     cairo_set_source_rgba(cr, table.unpack(COLORS.bar_bg))
 
@@ -291,20 +286,13 @@ end
 -- ============================================================
 function conky_draw_post()
     local surface = conky_surface()
-    if not surface then
-        return
-    end
+    if not surface then return end
 
-    if not is_network_connected() then
-        return
-    end
+    if not is_network_connected() then return end
 
     local cr = cairo_create(surface)
-    if not cr then
-        return
-    end
+    if not cr then return end
 
-    -- Get cached speed values
     local up_speed, down_speed = get_cached_speeds()
 
     for bar_idx, params in ipairs(BAR_CONFIG) do
